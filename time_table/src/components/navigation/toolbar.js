@@ -2,7 +2,7 @@ import React from "react";
 
 function Toolbar() {
   return (
-    <div className="w-full h-16 bg-bck-3">
+    <div className="w-full h-16 bg-bck-4">
       <div className="w-5/6 mx-auto">
         <div className="w-1/2 text-lg md:text-2xl sm:w-2/3 sm:text-xl inline-block my-4 font-light">
           TIME TABLE GENERATOR

@@ -5,7 +5,7 @@ import linkedin from "../../assets/images/linkedin.png";
 
 function Footer() {
   return (
-    <div className="w-full h-auto bg-bck-3">
+    <div className="w-full h-auto bg-bck-4">
       <div className="w-5/6 mx-auto ">
         <div className="w-2/3 text-lg sm:w-3/4 inline-block my-2 font-light">
           copyright@ IIITV

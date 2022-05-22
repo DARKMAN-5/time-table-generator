@@ -5,10 +5,10 @@ module.exports = {
       colors: {
         visibility: ["group-hover"],
         bck: {
-          1: "#F4EEFF",
-          2: "#DCD6F7",
-          3: "#A6B1E1",
-          4: "#424874",
+          1: "#E8F9FD",
+          2: "#79DAE8",
+          3: "#0AA1DD",
+          4: "#2155CD",
         },
       },
     },

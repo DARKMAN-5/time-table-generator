@@ -15,6 +15,7 @@ function Home() {
   ];
 
   const [allcol, setAllcol] = useState([]);
+  const [add, setAdd] = useState(false);
 
   const [int, setInt] = useState(null);
   let cap = {
@@ -25,13 +26,37 @@ function Home() {
   const col = [cap];
   const [timecol, setTimecol] = useState([]);
 
-  console.log(timecol);
+  // console.log(timecol);
 
   const maxtem = 1050;
 
   let [info, setInfo] = useState(null);
 
   let prehandleclick = (event, index) => {
+    let idx = allcol[index].length - 1;
+    if (add) {
+      if (
+        allcol[index][idx].slot !== null &&
+        allcol[index][idx].duration !== null
+      ) {
+        let newtem = int + parseInt(allcol[index][idx].duration);
+
+        console.log(newtem);
+
+        if (newtem < maxtem) {
+          handleclick(event, index);
+        } else {
+          setInfo("Time limit Exceeded. ");
+        }
+      } else {
+        setInfo("Fisrt Enter Slot and Duration. ");
+      }
+    } else {
+      setInfo("Fisrt Add. ");
+    }
+  };
+
+  let preAddhandle = (event, index) => {
     console.log(int);
     let idx = allcol[index].length - 1;
     if (
@@ -71,7 +96,8 @@ function Home() {
           });
         });
         setInt(newtem);
-        handleclick(event, index);
+        setInfo(null);
+        setAdd(true);
       } else {
         setInfo("Time limit Exceeded.");
       }
@@ -82,6 +108,7 @@ function Home() {
 
   function handleclick(event, index) {
     setInfo(null);
+    setAdd(false);
     setAllcol((prev) => {
       return Object.values({
         ...prev,
@@ -156,11 +183,14 @@ function Home() {
 
   let allcolval = allcol.map((item, index) => {
     return (
-      <div className="group" id={index + "allcol"}>
-        <h2>{days[index]}</h2>
+      <div
+        className="group mx-auto bg-bck-2 my-3 rounded py-4"
+        id={index + "allcol"}
+      >
+        <h2 className="text-center text-lg font-bold">{days[index]}</h2>
         <div className="hidden group-hover:block">
           <div>
-            <h5>Enter the start time for time table.</h5>
+            <h5>Enter the Start Time</h5>
             <input
               type="time"
               id="appt"
@@ -184,20 +214,52 @@ function Home() {
             <button onClick={(event) => prehandleclick(event, index)}>
               New
             </button>
-            <button onClick="">Add</button>
-            <div>
-              {/* <button onClick={exportPDF}>Generate Report</button> */}
-            </div>
+            <button onClick={(event) => preAddhandle(event, index)}>Add</button>
           </div>
         </div>
       </div>
     );
   });
 
+  let exportPDF = () => {
+    const unit = "pt";
+    const size = "A4"; // Use A1, A2, A3 or A4
+    const orientation = "portrait"; // portrait or landscape
+
+    const marginLeft = 40;
+    const doc = new jsPDF(orientation, unit, size);
+
+    doc.setFontSize(20);
+
+    const title = "Time Table";
+    doc.text(title, 250, 30);
+    doc.setFontSize(10);
+
+    allcol.map((col, index) => {
+      let headers = [timecol[index]];
+      let data = allcol[index].map((elt) => elt.slot);
+      let ori = index === 0 ? 50 : doc.lastAutoTable.finalY + 50;
+      console.log(data);
+
+      let content = {
+        theme: "grid",
+        startY: ori,
+        head: headers,
+        body: [data],
+      };
+      doc.text(days[index], marginLeft, ori - 10);
+      doc.autoTable(content);
+      return 0;
+    });
+    doc.save("Time-Table.pdf");
+  };
+
   return (
-    <div>
-      <div>
-        <div>Enter the total no. of working days in Week.</div>
+    <div className="mx-auto my-5 w-1/2">
+      <div className="bg-bck-3 text-center rounded ">
+        <div className="pt-5 text-xl font-semibold">
+          Enter the Total number of working days in a Week
+        </div>
         <input
           type="number"
           name="rows"
@@ -213,11 +275,20 @@ function Home() {
           value={rows}
           min="1"
           max="7"
+          className="placeholder-teal-400 border border-teal-500 rounded w-28 my-5 text-center outline-none text-blue-700"
           required
         />
-        {rows}
+        {/* {rows} */}
       </div>
       {allcolval}
+      <div className="w-1/3 mx-auto align-center my-3">
+        <button
+          onClick={exportPDF}
+          className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+        >
+          Generate Time Table
+        </button>
+      </div>
     </div>
   );
 }
