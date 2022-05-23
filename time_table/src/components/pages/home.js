@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import Table from "../navigation/table";
 
 function Home() {
   const [rows, setRows] = useState(null);
@@ -72,10 +73,10 @@ function Home() {
       }
       hrs = Math.floor(hrs) + "";
 
-      console.log(hrs, min);
+      // console.log(hrs, min);
       let newtem = int + parseInt(allcol[index][idx].duration);
 
-      console.log(newtem);
+      // console.log(newtem);
 
       if (newtem < maxtem) {
         let newhrs = newtem / 60;
@@ -96,7 +97,7 @@ function Home() {
           });
         });
         setInt(newtem);
-        setInfo(null);
+        setInfo("Added");
         setAdd(true);
       } else {
         setInfo("Time Exceeded than 5:30 PM");
@@ -215,7 +216,6 @@ function Home() {
                     60 * parseInt(tem.slice(0, 2)) + parseInt(tem.slice(3));
                   setInt(tot);
                 }}
-                value={int}
                 className="inline-block placeholder-teal-400 border border-teal-500 rounded  my-5 text-center outline-none text-blue-700"
                 required
               />
@@ -246,12 +246,13 @@ function Home() {
     );
   });
 
+  // console.log(allcol);
+
   let exportPDF = () => {
     const unit = "pt";
     const size = "A4"; // Use A1, A2, A3 or A4
     const orientation = "portrait"; // portrait or landscape
 
-    const marginLeft = 40;
     const doc = new jsPDF(orientation, unit, size);
 
     doc.setFontSize(20);
@@ -261,10 +262,12 @@ function Home() {
     doc.setFontSize(10);
 
     allcol.map((col, index) => {
-      let headers = [timecol[index]];
+      let headers = [[...timecol[index]]];
       let data = allcol[index].map((elt) => elt.slot);
-      let ori = index === 0 ? 50 : doc.lastAutoTable.finalY + 50;
+      let ori = index === 0 ? 50 : doc.lastAutoTable.finalY;
       console.log(data);
+      headers[0].unshift("Day");
+      data.unshift(days[index]);
 
       let content = {
         theme: "grid",
@@ -272,11 +275,43 @@ function Home() {
         head: headers,
         body: [data],
       };
-      doc.text(days[index], marginLeft, ori - 10);
       doc.autoTable(content);
       return 0;
     });
     doc.save("Time-Table.pdf");
+  };
+
+  console.log("timecol ", timecol);
+
+  const [tbl, setTbl] = useState(null);
+  const crtTable = () => {
+    let ntbl = allcol.map((col, index) => {
+      let data = [
+        {
+          col1: days[index],
+        },
+      ];
+
+      let columns = [
+        {
+          Header: "Day",
+          accessor: "col1", // accessor is the "key" in the data
+        },
+      ];
+
+      for (let i = 0; i < allcol[index].length; i++) {
+        let st = "col" + i + 2;
+        data[0][st] = allcol[index][i]["slot"];
+        let vl = {
+          Header: timecol[index][i],
+          accessor: st,
+        };
+        columns.push(vl);
+      }
+
+      return <Table data={data} columns={columns} />;
+    });
+    setTbl(ntbl);
   };
 
   return (
@@ -314,10 +349,19 @@ function Home() {
       {allcolval}
       <div className="w-1/3 mx-auto align-center my-3">
         <button
+          onClick={crtTable}
+          className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+        >
+          Create Table
+        </button>
+      </div>
+      <div className="flex flex-col">{tbl}</div>
+      <div className="w-1/3 mx-auto align-center my-3">
+        <button
           onClick={exportPDF}
           className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
         >
-          Generate Time Table
+          Print Time Table
         </button>
       </div>
     </div>
