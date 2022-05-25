@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import Table from "../navigation/table";
@@ -17,6 +17,80 @@ function Home() {
 
   const [allcol, setAllcol] = useState([]);
   const [add, setAdd] = useState(false);
+
+  const [lunchStartTime, setLunchStartTime] = useState("12:30");
+  const [lecturesBeforeLunch, setLecturesBeforeLunch] = useState("3");
+  const [lectureStartTimes, setLectureStartTimes] = useState([]);
+  const [lunchEndTimes, setLunchEndTimes] = useState([]);
+  const [lecturesAfterLunch, setLecturesAfterLunch] = useState("3");
+
+  const setPossibleStartTimes = () => {
+    const arr = [];
+
+    const splitTime = lunchStartTime.split(":");
+    const splitTimeHr = parseInt(splitTime[0]);
+    const splitTimeMin = parseInt(splitTime[1]);
+
+    let maxSplitStartTime = splitTimeHr - parseInt(lecturesBeforeLunch);
+
+    if (maxSplitStartTime <= 0) {
+      maxSplitStartTime += 12;
+    }
+
+    let tempTimeHr = 8;
+    let tempTimeMin = 0;
+
+    while (tempTimeHr <= maxSplitStartTime) {
+      arr.push(`${tempTimeHr}:${tempTimeMin < 10 ? "0" + tempTimeMin : tempTimeMin} AM`);
+      tempTimeMin += 15;
+
+      if (tempTimeMin == 60) {
+        tempTimeHr += 1;
+        tempTimeMin = 0;
+      }
+
+      if (tempTimeHr == maxSplitStartTime && tempTimeMin > splitTimeMin) {
+        break;
+      }
+    }
+
+    setLectureStartTimes(arr);
+  }
+
+  const setPossibleLunchEndTimes = () => {
+    const arr = [];
+
+    const splitTime = lunchStartTime.split(":");
+    const splitTimeHr = parseInt(splitTime[0]);
+    const splitTimeMin = parseInt(splitTime[1]);
+
+    let tempTimeHr = splitTimeHr + 1;
+    let tempTimeMin = splitTimeMin;
+
+    if (tempTimeHr > 12) {
+      tempTimeHr -= 12;
+    }
+
+    for (let i = 0; i < 3; i++) {
+      arr.push(`${tempTimeHr}:${tempTimeMin < 10 ? "0" + tempTimeMin : tempTimeMin} PM`);
+      tempTimeMin += 15;
+      if (tempTimeMin == 60) {
+        tempTimeHr += 1;
+        tempTimeMin = 0;
+      }
+    }
+
+    setLunchEndTimes(arr);
+  }
+
+  useEffect(() => {
+    setPossibleStartTimes();
+  }, [lecturesBeforeLunch]);
+
+  useEffect(() => {
+    setPossibleStartTimes();
+    setPossibleLunchEndTimes();
+  }, [lunchStartTime]);
 
   const [int, setInt] = useState(null);
   let cap = {
@@ -311,6 +385,7 @@ function Home() {
 
       return <Table data={data} columns={columns} />;
     });
+
     setTbl(ntbl);
   };
 
@@ -344,7 +419,52 @@ function Home() {
           required
         />
         {/* {rows} */}
+        <br />
+
+        <div className="pt-5 text-xl font-semibold">Select lunch start time</div>
+        <select
+          value={lunchStartTime}
+          onChange={e => setLunchStartTime(e.target.value)}
+          style={{ color: 'black' }} id="lunchStartTime" name="lunchStartTime">
+          <option value="12:30">12:30 PM</option>
+          <option value="12:45">12:45 PM</option>
+          <option value="1:00">1:00 PM</option>
+        </select>
+
+        <div className="pt-5 text-xl font-semibold">Select number of lectures before lunch</div>
+        <select style={{ color: 'black' }}
+          value={lecturesBeforeLunch}
+          onChange={e => setLecturesBeforeLunch(e.target.value)}
+          id="lecturesBeforeLunch" name="lecturesBeforeLunch">
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+
+        <div className="pt-5 text-xl font-semibold">Select lecture start time</div>
+        <select style={{ color: 'black' }} id="lectureStartTime" name="lecturesStartTime">
+          {lectureStartTimes.map(time => (
+            <option value={time}>{time}</option>
+          ))}
+        </select>
+
+        <div className="pt-5 text-xl font-semibold">Select lunch end time</div>
+        <select
+          style={{ color: 'black' }} id="lunchEndTime" name="lunchEndTime">
+          {lunchEndTimes.map(time => (
+            <option value={time}>{time}</option>
+          ))}
+        </select>
+
+        <div className="pt-5 text-xl font-semibold">Select number of lectures after lunch</div>
+        <select style={{ color: 'black' }}
+          value={lecturesAfterLunch}
+          onChange={e => setLecturesAfterLunch(e.target.value)}
+          id="lecturesAfterLunch" name="lecturesAfterLunch">
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
       </div>
+
       <h5 className="text-red-500 text-center font-bold">{hinfo}</h5>
       {allcolval}
       <div className="w-1/3 mx-auto align-center my-3">
