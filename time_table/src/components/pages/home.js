@@ -10,7 +10,7 @@ function Home() {
   const [timecol, setTimecol] = useState(null);
   const [sttime, setSttime] = useState("8:00");
   const [lsttime, setLsttime] = useState(null);
-
+  const [coursecode, setCourseCode] = useState("");
   let days = [
     "Monday",
     "Tuesday",
@@ -19,7 +19,7 @@ function Home() {
     "Friday",
     "Saturday",
   ];
-
+  console.log(coursecode);
   const [allcol, setAllcol] = useState([]);
 
   const [lunchStartTime, setLunchStartTime] = useState("12:30");
@@ -27,7 +27,11 @@ function Home() {
   const [lectureStartTimes, setLectureStartTimes] = useState([]);
   const [lunchEndTimes, setLunchEndTimes] = useState([]);
   const [lecturesAfterLunch, setLecturesAfterLunch] = useState("3");
-
+  const [noOfLecs, setnoOfLecs] = useState(0);
+  const [lecstime, setlecstime] = useState(0);
+  const [tutstime, settutstime] = useState(0);
+  const [labtime, setlabtime] = useState(0);
+  const [priority, setpriority] = useState("");
   const setPossibleStartTimes = () => {
     const arr = [];
 
@@ -108,7 +112,7 @@ function Home() {
   let [info, setInfo] = useState(null);
 
   console.log(allcol);
-
+  let submitCourseData = (event) => {};
   let colval = allcol.map((item, index) => {
     return allcol[index].map((item1, index1) => {
       if (allcol[index][index1] !== "Lunch") {
@@ -410,6 +414,101 @@ function Home() {
           <option value="3">3</option>
           <option value="4">4</option>
         </select>
+      </div>
+      <div className="bg-bck-3 text-center rounded my-3 py-2">
+        <div className="pt-5 text-xl font-semibold">Course Code</div>
+        <input
+          type="text"
+          name="course_code"
+          id="course_code"
+          onChange={(event) => {
+            setCourseCode(event.target.value);
+          }}
+          value={coursecode}
+          min={1}
+          max={7}
+          className="placeholder-teal-400 border border-teal-500 rounded  my-3 text-center outline-none text-black"
+          required
+        />
+        <div className="pt-5 text-xl font-semibold">Number of Lectures</div>
+        <input
+          type="text"
+          name="noOfLecs"
+          id="noOfLecs"
+          onChange={(event) => {
+            setnoOfLecs(event.target.value);
+          }}
+          value={noOfLecs}
+          min={1}
+          max={7}
+          className="placeholder-teal-400 border border-teal-500 rounded  my-3 text-center outline-none text-black"
+          required
+        />
+        <div className="pt-5 text-xl font-semibold">Lecture Time(hrs/week)</div>
+        <input
+          type="text"
+          name="lecstime"
+          id="lecstime"
+          onChange={(event) => {
+            setlecstime(event.target.value);
+          }}
+          value={lecstime}
+          min={1}
+          max={7}
+          className="placeholder-teal-400 border border-teal-500 rounded  my-3 text-center outline-none text-black"
+          required
+        />
+        <div className="pt-5 text-xl font-semibold">
+          Tutorial Time(hrs/week)
+        </div>
+        <input
+          type="text"
+          name="tutstime"
+          id="tutstime"
+          onChange={(event) => {
+            settutstime(event.target.value);
+          }}
+          value={tutstime}
+          min={1}
+          max={7}
+          className="placeholder-teal-400 border border-teal-500 rounded  my-3 text-center outline-none text-black"
+          required
+        />
+        <div className="pt-5 text-xl font-semibold">
+          Laboratory Time(hrs/week)
+        </div>
+        <input
+          type="text"
+          name="labtime"
+          id="labtime"
+          onChange={(event) => {
+            setlabtime(event.target.value);
+          }}
+          value={labtime}
+          min={1}
+          max={7}
+          className="placeholder-teal-400 border border-teal-500 rounded  my-3 text-center outline-none text-black"
+          required
+        />
+        <div className="pt-5 text-xl font-semibold">Priority</div>
+        <select
+          style={{ color: "black" }}
+          value={priority}
+          onChange={(e) => setpriority(e.target.value)}
+          id="priority"
+          name="priority"
+        >
+          <option value="morning">Morning</option>
+          <option value="afternoon">Afternoon</option>
+        </select>
+        <div className="w-1/3 mx-auto align-center my-3">
+          <button
+            onClick={submitCourseData}
+            className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+          >
+            Submit
+          </button>
+        </div>
       </div>
 
       <h5 className="text-red-500 text-center font-bold">{hinfo}</h5>
