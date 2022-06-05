@@ -10,7 +10,6 @@ function Home() {
   const [timecol, setTimecol] = useState(null);
   const [sttime, setSttime] = useState("8:00");
   const [lsttime, setLsttime] = useState(null);
-  const [coursecode, setCourseCode] = useState("");
   let days = [
     "Monday",
     "Tuesday",
@@ -19,19 +18,23 @@ function Home() {
     "Friday",
     "Saturday",
   ];
-  console.log(coursecode);
-  const [allcol, setAllcol] = useState([]);
 
+  const [allcol, setAllcol] = useState([]);
+  const [allinpcrs, setAllinpcrs] = useState([]);
   const [lunchStartTime, setLunchStartTime] = useState("12:30");
   const [lecturesBeforeLunch, setLecturesBeforeLunch] = useState("3");
   const [lectureStartTimes, setLectureStartTimes] = useState([]);
   const [lunchEndTimes, setLunchEndTimes] = useState([]);
   const [lecturesAfterLunch, setLecturesAfterLunch] = useState("3");
-  const [noOfLecs, setnoOfLecs] = useState(0);
-  const [lecstime, setlecstime] = useState(0);
-  const [tutstime, settutstime] = useState(0);
-  const [labtime, setlabtime] = useState(0);
-  const [priority, setpriority] = useState("");
+
+  const [allcrsinfo, setAllcrsinfo] = useState({
+    coursecode: "",
+    noOfLecs: 0,
+    totlec: { time: 0, priority: null },
+    tottut: { time: 0, priority: null },
+    totlab: { time: 0, priority: null },
+  });
+
   const setPossibleStartTimes = () => {
     const arr = [];
 
@@ -112,7 +115,7 @@ function Home() {
   let [info, setInfo] = useState(null);
 
   console.log(allcol);
-  let submitCourseData = (event) => {};
+
   let colval = allcol.map((item, index) => {
     return allcol[index].map((item1, index1) => {
       if (allcol[index][index1] !== "Lunch") {
@@ -172,7 +175,17 @@ function Home() {
     );
   });
 
-  // console.log(allcol);
+  console.log(allinpcrs);
+  let submitCourseData = () => {
+    setAllinpcrs((prev) => [...prev, allcrsinfo]);
+    setAllcrsinfo({
+      coursecode: "",
+      noOfLecs: 0,
+      totlec: { time: 0, priority: 0 },
+      tottut: { time: 0, priority: 0 },
+      totlab: { time: 0, priority: 0 },
+    });
+  };
 
   let exportPDF = () => {
     const unit = "pt";
@@ -415,101 +428,190 @@ function Home() {
           <option value="4">4</option>
         </select>
       </div>
-      <div className="bg-bck-3 text-center rounded my-3 py-2">
-        <div className="pt-5 text-xl font-semibold">Course Code</div>
-        <input
-          type="text"
-          name="course_code"
-          id="course_code"
-          onChange={(event) => {
-            setCourseCode(event.target.value);
-          }}
-          value={coursecode}
-          min={1}
-          max={7}
-          className="placeholder-teal-400 border border-teal-500 rounded  my-3 text-center outline-none text-black"
-          required
-        />
-        <div className="pt-5 text-xl font-semibold">Number of Lectures</div>
-        <input
-          type="text"
-          name="noOfLecs"
-          id="noOfLecs"
-          onChange={(event) => {
-            setnoOfLecs(event.target.value);
-          }}
-          value={noOfLecs}
-          min={1}
-          max={7}
-          className="placeholder-teal-400 border border-teal-500 rounded  my-3 text-center outline-none text-black"
-          required
-        />
-        <div className="pt-5 text-xl font-semibold">Lecture Time(hrs/week)</div>
-        <input
-          type="text"
-          name="lecstime"
-          id="lecstime"
-          onChange={(event) => {
-            setlecstime(event.target.value);
-          }}
-          value={lecstime}
-          min={1}
-          max={7}
-          className="placeholder-teal-400 border border-teal-500 rounded  my-3 text-center outline-none text-black"
-          required
-        />
-        <div className="pt-5 text-xl font-semibold">
-          Tutorial Time(hrs/week)
+
+      {/* *************************************************************************************************************** */}
+
+      <div className="bg-bck-3 text-center rounded my-3 py-2 mx-auto">
+        <div className="flex justify-around">
+          <div className="my-2">
+            <div className="py-2 text-sm font-light">Course Code</div>
+            <input
+              type="text"
+              name="course_code"
+              id="course_code"
+              onChange={(event) => {
+                setAllcrsinfo((prev) => {
+                  return { ...prev, coursecode: event.target.value };
+                });
+              }}
+              value={allcrsinfo.coursecode}
+              className="rounded my-3 text-center outline-none text-black w-3/5"
+              required
+            />
+          </div>
+          <div className="my-2">
+            <div className="py-2 text-sm font-light">Total Lectures</div>
+            <input
+              type="number"
+              name="noOfLecs"
+              id="noOfLecs"
+              onChange={(event) => {
+                setAllcrsinfo((prev) => {
+                  return { ...prev, noOfLecs: event.target.value };
+                });
+              }}
+              value={allcrsinfo.noOfLecs}
+              className="rounded my-3 text-center outline-none text-black w-3/5"
+              required
+            />
+          </div>
+          <div className="flex justify-evenly my-2">
+            <div className="flex flex-col mx-2">
+              <div className="py-2 text-sm font-bold">L</div>
+              <input
+                type="number"
+                name="lecstime"
+                id="lecstime"
+                onChange={(event) => {
+                  setAllcrsinfo((prev) => {
+                    return {
+                      ...prev,
+                      totlec: { ...prev.totlec, time: event.target.value },
+                    };
+                  });
+                }}
+                value={allcrsinfo.totlec.time}
+                min={1}
+                max={7}
+                className="rounded  my-3 text-center outline-none text-black"
+                required
+              />
+
+              <select
+                style={{ color: "black" }}
+                value={allcrsinfo.totlec.priority}
+                onChange={(e) => {
+                  setAllcrsinfo((prev) => {
+                    return {
+                      ...prev,
+                      totlec: { ...prev.totlec, priority: e.target.value },
+                    };
+                  });
+                }}
+                id="priority"
+                name="priority"
+                className="w-full"
+              >
+                <option
+                  value="Select"
+                  selected="true"
+                  // disabled="disabled"
+                ></option>
+                <option value="morning">pre</option>
+                <option value="afternoon">post</option>
+              </select>
+            </div>
+            <div className="flex flex-col mx-2">
+              <div className="py-2 text-sm font-bold">T</div>
+              <input
+                type="number"
+                name="tutstime"
+                id="tutstime"
+                onChange={(event) => {
+                  setAllcrsinfo((prev) => {
+                    return {
+                      ...prev,
+                      tottut: { ...prev.tottut, time: event.target.value },
+                    };
+                  });
+                }}
+                value={allcrsinfo.tottut.time}
+                min={1}
+                max={9}
+                className=" rounded  my-3 text-center outline-none text-black"
+                required
+              />
+
+              <select
+                style={{ color: "black" }}
+                value={allcrsinfo.tottut.priority}
+                onChange={(e) => {
+                  setAllcrsinfo((prev) => {
+                    return {
+                      ...prev,
+                      tottut: { ...prev.tottut, priority: e.target.value },
+                    };
+                  });
+                }}
+                id="priority"
+                name="priority"
+              >
+                <option
+                  value="Select"
+                  selected="true"
+                  // disabled="disabled"
+                ></option>
+                <option value="morning">pre</option>
+                <option value="afternoon">post</option>
+              </select>
+            </div>
+            <div className="flex flex-col mx-2">
+              <div className="py-2 text-sm font-bold">P</div>
+              <input
+                type="number"
+                name="labtime"
+                id="labtime"
+                onChange={(event) => {
+                  setAllcrsinfo((prev) => {
+                    return {
+                      ...prev,
+                      totlab: { ...prev.totlab, time: event.target.value },
+                    };
+                  });
+                }}
+                value={allcrsinfo.totlab.time}
+                min={1}
+                max={9}
+                className=" rounded  my-3 text-center outline-none text-black"
+                required
+              />
+
+              <select
+                style={{ color: "black" }}
+                value={allcrsinfo.totlab.priority}
+                onChange={(e) => {
+                  setAllcrsinfo((prev) => {
+                    return {
+                      ...prev,
+                      totlab: { ...prev.totlab, priority: e.target.value },
+                    };
+                  });
+                }}
+                id="priority"
+                name="priority"
+              >
+                <option
+                  value="Select"
+                  selected="true"
+                  // disabled="disabled"
+                ></option>
+                <option value="morning">pre</option>
+                <option value="afternoon">post</option>
+              </select>
+            </div>
+          </div>
         </div>
-        <input
-          type="text"
-          name="tutstime"
-          id="tutstime"
-          onChange={(event) => {
-            settutstime(event.target.value);
-          }}
-          value={tutstime}
-          min={1}
-          max={7}
-          className="placeholder-teal-400 border border-teal-500 rounded  my-3 text-center outline-none text-black"
-          required
-        />
-        <div className="pt-5 text-xl font-semibold">
-          Laboratory Time(hrs/week)
-        </div>
-        <input
-          type="text"
-          name="labtime"
-          id="labtime"
-          onChange={(event) => {
-            setlabtime(event.target.value);
-          }}
-          value={labtime}
-          min={1}
-          max={7}
-          className="placeholder-teal-400 border border-teal-500 rounded  my-3 text-center outline-none text-black"
-          required
-        />
-        <div className="pt-5 text-xl font-semibold">Priority</div>
-        <select
-          style={{ color: "black" }}
-          value={priority}
-          onChange={(e) => setpriority(e.target.value)}
-          id="priority"
-          name="priority"
-        >
-          <option value="morning">Morning</option>
-          <option value="afternoon">Afternoon</option>
-        </select>
         <div className="w-1/3 mx-auto align-center my-3">
           <button
             onClick={submitCourseData}
-            className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            className="w-full text-white bg-bck-4 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
           >
             Submit
           </button>
         </div>
       </div>
+
+      {/* ********************************************************************************************* */}
 
       <h5 className="text-red-500 text-center font-bold">{hinfo}</h5>
       <div className="w-1/3 mx-auto align-center my-3">
