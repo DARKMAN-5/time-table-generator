@@ -606,7 +606,7 @@ function Home() {
             onClick={submitCourseData}
             className="w-full text-white bg-bck-4 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
           >
-            Submit
+            Add
           </button>
         </div>
       </div>
@@ -619,7 +619,7 @@ function Home() {
           onClick={handleclick}
           className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
         >
-          Add
+          Generate
         </button>
       </div>
       {allcolval}
