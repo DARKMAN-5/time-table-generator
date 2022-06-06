@@ -10,6 +10,7 @@ function Home() {
   const [timecol, setTimecol] = useState(null);
   const [sttime, setSttime] = useState("8:00");
   const [lsttime, setLsttime] = useState(null);
+  const [lead, setLead] = useState(0);
 
   function courseInfo(courseCode, totalLectures, l, lPr, t, tPr, p, pPr) {
     this.courseCode = courseCode;
@@ -47,20 +48,20 @@ function Home() {
   ];
 
   const [allcol, setAllcol] = useState([]);
-  const [allinpcrs, setAllinpcrs] = useState([]);
+  // const [allinpcrs, setAllinpcrs] = useState([]);
   const [lunchStartTime, setLunchStartTime] = useState("12:30");
   const [lecturesBeforeLunch, setLecturesBeforeLunch] = useState("3");
   const [lectureStartTimes, setLectureStartTimes] = useState([]);
   const [lunchEndTimes, setLunchEndTimes] = useState([]);
   const [lecturesAfterLunch, setLecturesAfterLunch] = useState("3");
 
-  const [allcrsinfo, setAllcrsinfo] = useState({
-    coursecode: "",
-    noOfLecs: 0,
-    totlec: { time: 0, priority: null },
-    tottut: { time: 0, priority: null },
-    totlab: { time: 0, priority: null },
-  });
+  // const [allcrsinfo, setAllcrsinfo] = useState({
+  //   coursecode: "",
+  //   noOfLecs: 0,
+  //   totlec: { time: 0, priority: null },
+  //   tottut: { time: 0, priority: null },
+  //   totlab: { time: 0, priority: null },
+  // });
 
   const setPossibleStartTimes = () => {
     const arr = [];
@@ -202,17 +203,17 @@ function Home() {
     );
   });
 
-  console.log(allinpcrs);
-  let submitCourseData = () => {
-    setAllinpcrs((prev) => [...prev, allcrsinfo]);
-    setAllcrsinfo({
-      coursecode: "",
-      noOfLecs: 0,
-      totlec: { time: 0, priority: 0 },
-      tottut: { time: 0, priority: 0 },
-      totlab: { time: 0, priority: 0 },
-    });
-  };
+  // console.log(allinpcrs);
+  // let submitCourseData = () => {
+  //   setAllinpcrs((prev) => [...prev, allcrsinfo]);
+  //   setAllcrsinfo({
+  //     coursecode: "",
+  //     noOfLecs: 0,
+  //     totlec: { time: 0, priority: 0 },
+  //     tottut: { time: 0, priority: 0 },
+  //     totlab: { time: 0, priority: 0 },
+  //   });
+  // };
 
   let exportPDF = () => {
     const unit = "pt";
@@ -254,7 +255,12 @@ function Home() {
   console.log("timecol ", timecol);
 
   const [tbl, setTbl] = useState(null);
-  const crtTable = () => {
+
+  function crtTable() {
+    if (allcol.length === 0) {
+      return null;
+    }
+
     let data = [];
 
     let columns = [
@@ -292,9 +298,13 @@ function Home() {
 
     let ntbl = <Table data={data} columns={columns} />;
     setTbl(ntbl);
-  };
+  }
 
   console.log(sttime, lsttime);
+
+  useEffect(() => {
+    crtTable();
+  }, [lead]);
 
   function handleclick() {
     setInfo(null);
@@ -339,265 +349,277 @@ function Home() {
     for (let i = 0; i < rows; i++) {
       setAllcol((prev) => [...prev, ls]);
     }
-
     setSbutt(true);
+    setLead(1);
   }
 
   return (
-    <div className="mx-auto my-5 w-1/2">
-      <div className="bg-bck-3 text-center rounded my-3">
-        <div className="pt-5 text-xl font-semibold">Total working days</div>
-        <input
-          type="number"
-          name="rows"
-          id="rows"
-          onChange={(event) => {
-            if (event.target.value > 6 || event.target.value < 0) {
-              setHinfo("Enter value from 1 to 6");
-            } else {
-              setHinfo(null);
-              setRows(event.target.value);
-              setSbutt(false);
-              setAllcol([]);
-              setTbl(null);
-            }
-          }}
-          value={rows}
-          min={1}
-          max={7}
-          className="placeholder-teal-400 border border-teal-500 rounded  my-3 text-center outline-none text-black"
-          required
-        />
-        {/* {rows} */}
-        {/* <br /> */}
-      </div>
+    <div className="mx-auto my-5 w-10/12">
+      <div className={lead === 0 ? "block w-2/3 mx-auto" : "hidden"}>
+        <div className="bg-bck-3 text-center rounded my-3">
+          <div className="pt-5 text-xl font-semibold">Total working days</div>
+          <input
+            type="number"
+            name="rows"
+            id="rows"
+            onChange={(event) => {
+              if (event.target.value > 6 || event.target.value < 0) {
+                setHinfo("Enter value from 1 to 6");
+              } else {
+                setHinfo(null);
+                setRows(event.target.value);
+                setSbutt(false);
+                setAllcol([]);
+                setTbl(null);
+              }
+            }}
+            value={rows}
+            min={1}
+            max={7}
+            className="placeholder-teal-400 border border-teal-500 rounded  my-3 text-center outline-none text-black"
+            required
+          />
+          {/* {rows} */}
+          {/* <br /> */}
+        </div>
+        <div className="bg-bck-3 text-center rounded my-3 py-2">
+          <div className="pt-5 text-xl font-semibold">Lunch start time</div>
+          <select
+            value={lunchStartTime}
+            onChange={(e) => setLunchStartTime(e.target.value)}
+            style={{ color: "black" }}
+            id="lunchStartTime"
+            name="lunchStartTime"
+          >
+            <option value="12:30">12:30 PM</option>
+            <option value="12:45">12:45 PM</option>
+            <option value="1:00">1:00 PM</option>
+          </select>
 
-      <div className="bg-bck-3 text-center rounded my-3 py-2">
-        <div className="pt-5 text-xl font-semibold">Lunch start time</div>
-        <select
-          value={lunchStartTime}
-          onChange={(e) => setLunchStartTime(e.target.value)}
-          style={{ color: "black" }}
-          id="lunchStartTime"
-          name="lunchStartTime"
-        >
-          <option value="12:30">12:30 PM</option>
-          <option value="12:45">12:45 PM</option>
-          <option value="1:00">1:00 PM</option>
-        </select>
+          <div className="pt-5 text-xl font-semibold">
+            Lectures before lunch
+          </div>
+          <select
+            style={{ color: "black" }}
+            value={lecturesBeforeLunch}
+            onChange={(e) => setLecturesBeforeLunch(e.target.value)}
+            id="lecturesBeforeLunch"
+            name="lecturesBeforeLunch"
+          >
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
 
-        <div className="pt-5 text-xl font-semibold">Lectures before lunch</div>
-        <select
-          style={{ color: "black" }}
-          value={lecturesBeforeLunch}
-          onChange={(e) => setLecturesBeforeLunch(e.target.value)}
-          id="lecturesBeforeLunch"
-          name="lecturesBeforeLunch"
-        >
-          <option value="3">3</option>
-          <option value="4">4</option>
-        </select>
+          <div className="pt-5 text-xl font-semibold">Lecture start time</div>
+          <select
+            style={{ color: "black" }}
+            id="lectureStartTime"
+            name="lecturesStartTime"
+            onChange={(event) => {
+              let tem = event.target.value;
+              let st = tem.slice(0, -3);
+              setSttime(st);
+            }}
+          >
+            {lectureStartTimes.map((time) => (
+              <option value={time}>{time}</option>
+            ))}
+          </select>
 
-        <div className="pt-5 text-xl font-semibold">Lecture start time</div>
-        <select
-          style={{ color: "black" }}
-          id="lectureStartTime"
-          name="lecturesStartTime"
-          onChange={(event) => {
-            let tem = event.target.value;
-            let st = tem.slice(0, -3);
-            setSttime(st);
-          }}
-        >
-          {lectureStartTimes.map((time) => (
-            <option value={time}>{time}</option>
-          ))}
-        </select>
+          <div className="pt-5 text-xl font-semibold">Lunch end time</div>
+          <select
+            style={{ color: "black" }}
+            id="lunchEndTime"
+            name="lunchEndTime"
+            onChange={(event) => {
+              let tem = event.target.value;
+              let st = tem.slice(0, -3);
+              // let tot = 60 * parseInt(tem.slice(0, 2)) + parseInt(tem.slice(3));
+              setLsttime(st);
+            }}
+          >
+            {lunchEndTimes.map((time) => (
+              <option value={time}>{time}</option>
+            ))}
+          </select>
 
-        <div className="pt-5 text-xl font-semibold">Lunch end time</div>
-        <select
-          style={{ color: "black" }}
-          id="lunchEndTime"
-          name="lunchEndTime"
-          onChange={(event) => {
-            let tem = event.target.value;
-            let st = tem.slice(0, -3);
-            // let tot = 60 * parseInt(tem.slice(0, 2)) + parseInt(tem.slice(3));
-            setLsttime(st);
-          }}
-        >
-          {lunchEndTimes.map((time) => (
-            <option value={time}>{time}</option>
-          ))}
-        </select>
+          <div className="pt-5 text-xl font-semibold">Lectures after lunch</div>
+          <select
+            style={{ color: "black" }}
+            value={lecturesAfterLunch}
+            onChange={(e) => {
+              setLecturesAfterLunch(e.target.value);
+            }}
+            id="lecturesAfterLunch"
+            name="lecturesAfterLunch"
+          >
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </div>
 
-        <div className="pt-5 text-xl font-semibold">Lectures after lunch</div>
-        <select
-          style={{ color: "black" }}
-          value={lecturesAfterLunch}
-          onChange={(e) => {
-            setLecturesAfterLunch(e.target.value);
-          }}
-          id="lecturesAfterLunch"
-          name="lecturesAfterLunch"
-        >
-          <option value="3">3</option>
-          <option value="4">4</option>
-        </select>
+        <div className="w-1/3 mx-auto align-center my-3">
+          <button
+            onClick={rows === null ? null : handleclick}
+            className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+          >
+            Generate
+          </button>
+        </div>
       </div>
 
       {/* *************************************************************************************************************** */}
-
-      <div className="bg-bck-3 text-center rounded my-3 py-2 mx-auto">
-        {courseInputs.map((obj) => (
-          <div className="flex justify-around">
-            <div className="my-2">
-              <div className="py-2 text-sm font-light">Course Code</div>
-              <input
-                type="text"
-                name="course_code"
-                id="course_code"
-                onChange={(event) => {
-                  obj.courseCode = event.target.value;
-                }}
-                className="rounded my-3 text-center outline-none text-black w-3/5"
-                required
-              />
-            </div>
-
-            <div className="flex justify-evenly my-2">
-              <div className="flex flex-col mx-2">
-                <div className="py-2 text-sm font-bold">L</div>
+      <div className={lead === 1 ? "block" : "hidden"}>
+        <div className=" flex flex-row flex-wrap">
+          {courseInputs.map((obj) => (
+            <div className="flex flex-col justify-around bg-bck-3 text-center rounded my-3 py-2 mx-auto">
+              <div className="mt-1">
+                <div className="text-sm font-light">Course Code</div>
                 <input
-                  type="number"
-                  name="lecstime"
-                  id="lecstime"
+                  type="text"
+                  name="course_code"
+                  id="course_code"
                   onChange={(event) => {
-                    obj.l =
-                      event.target.value === ""
-                        ? 0
-                        : parseInt(event.target.value, 10);
+                    obj.courseCode = event.target.value;
                   }}
-                  defaultValue={obj.l}
-                  min={1}
-                  max={7}
-                  className="rounded  my-3 text-center outline-none text-black"
+                  className="rounded mt-1 text-center outline-none text-black w-3/5"
                   required
                 />
+              </div>
 
+              <div className="flex justify-evenly my-2">
+                <div className="flex flex-col mx-2">
+                  <div className="py-2 text-sm font-bold">L</div>
+                  <input
+                    type="number"
+                    name="lecstime"
+                    id="lecstime"
+                    onChange={(event) => {
+                      obj.l =
+                        event.target.value === ""
+                          ? 0
+                          : parseInt(event.target.value, 10);
+                    }}
+                    defaultValue={obj.l}
+                    min={1}
+                    max={7}
+                    className="rounded  my-1 text-center outline-none text-black"
+                    required
+                  />
+
+                  <select
+                    style={{ color: "black" }}
+                    value={obj.lPr}
+                    onChange={(e) => {
+                      obj.lPr = e.target.value;
+                    }}
+                    id="priority"
+                    name="priority"
+                    className="w-full"
+                  >
+                    <option
+                      value="Select"
+                      selected="true"
+                      // disabled="disabled"
+                    ></option>
+                    <option value="morning">pre</option>
+                    <option value="afternoon">post</option>
+                  </select>
+                </div>
+                <div className="flex flex-col">
+                  <div className="py-2 text-sm font-bold">T</div>
+                  <input
+                    type="number"
+                    name="tutstime"
+                    id="tutstime"
+                    onChange={(event) => {
+                      obj.t =
+                        event.target.value === ""
+                          ? 0
+                          : parseInt(event.target.value, 10);
+                    }}
+                    defaultValue={obj.t}
+                    min={1}
+                    max={9}
+                    className=" rounded  my-1 text-center outline-none text-black"
+                    required
+                  />
+
+                  <select
+                    style={{ color: "black" }}
+                    value={obj.tPr}
+                    onChange={(e) => {
+                      obj.tPr = e.target.value;
+                    }}
+                    id="priority"
+                    name="priority"
+                  >
+                    <option
+                      value="Select"
+                      selected="true"
+                      // disabled="disabled"
+                    ></option>
+                    <option value="morning">pre</option>
+                    <option value="afternoon">post</option>
+                  </select>
+                </div>
+                <div className="flex flex-col mx-2">
+                  <div className="py-2 text-sm font-bold">P</div>
+                  <input
+                    type="number"
+                    name="labtime"
+                    id="labtime"
+                    onChange={(event) => {
+                      obj.p =
+                        event.target.value === ""
+                          ? 0
+                          : parseInt(event.target.value, 10);
+                    }}
+                    defaultValue={obj.p}
+                    min={1}
+                    max={9}
+                    className=" rounded  my-1 text-center outline-none text-black"
+                    required
+                  />
+
+                  <select
+                    style={{ color: "black" }}
+                    value={obj.pPr}
+                    onChange={(e) => {
+                      obj.pPr = e.target.value;
+                    }}
+                    id="priority"
+                    name="priority"
+                  >
+                    <option
+                      value="Select"
+                      selected="true"
+                      // disabled="disabled"
+                    ></option>
+                    <option value="morning">pre</option>
+                    <option value="afternoon">post</option>
+                  </select>
+                </div>
+              </div>
+              <div className="my-2">
+                <div className="py-2 text-sm font-light">Lecture Time</div>
                 <select
                   style={{ color: "black" }}
-                  value={allcrsinfo.totlec.priority}
-                  onChange={(e) => {
-                    obj.lPr = e.target.value;
-                  }}
-                  id="priority"
-                  name="priority"
-                  className="w-full"
-                >
-                  <option
-                    value="Select"
-                    selected="true"
-                    // disabled="disabled"
-                  ></option>
-                  <option value="morning">pre</option>
-                  <option value="afternoon">post</option>
-                </select>
-              </div>
-              <div className="flex flex-col mx-2">
-                <div className="py-2 text-sm font-bold">T</div>
-                <input
-                  type="number"
-                  name="tutstime"
-                  id="tutstime"
                   onChange={(event) => {
-                    obj.t =
+                    obj.totalLectures =
                       event.target.value === ""
                         ? 0
-                        : parseInt(event.target.value, 10);
+                        : parseFloat(event.target.value, 10);
+                    console.log(courseInputs);
                   }}
-                  defaultValue={obj.t}
-                  min={1}
-                  max={9}
-                  className=" rounded  my-3 text-center outline-none text-black"
-                  required
-                />
-
-                <select
-                  style={{ color: "black" }}
-                  value={allcrsinfo.tottut.priority}
-                  onChange={(e) => {
-                    obj.tPr = e.target.value;
-                  }}
-                  id="priority"
-                  name="priority"
                 >
-                  <option
-                    value="Select"
-                    selected="true"
-                    // disabled="disabled"
-                  ></option>
-                  <option value="morning">pre</option>
-                  <option value="afternoon">post</option>
+                  <option value="Select" selected>
+                    Select
+                  </option>
+                  <option value="1">1</option>
+                  <option value="1.5">1.5</option>
                 </select>
-              </div>
-              <div className="flex flex-col mx-2">
-                <div className="py-2 text-sm font-bold">P</div>
-                <input
-                  type="number"
-                  name="labtime"
-                  id="labtime"
-                  onChange={(event) => {
-                    obj.p =
-                      event.target.value === ""
-                        ? 0
-                        : parseInt(event.target.value, 10);
-                  }}
-                  defaultValue={obj.p}
-                  min={1}
-                  max={9}
-                  className=" rounded  my-3 text-center outline-none text-black"
-                  required
-                />
-
-                <select
-                  style={{ color: "black" }}
-                  value={allcrsinfo.totlab.priority}
-                  onChange={(e) => {
-                    obj.pPr = e.target.value;
-                  }}
-                  id="priority"
-                  name="priority"
-                >
-                  <option
-                    value="Select"
-                    selected="true"
-                    // disabled="disabled"
-                  ></option>
-                  <option value="morning">pre</option>
-                  <option value="afternoon">post</option>
-                </select>
-              </div>
-            </div>
-            <div className="my-2">
-              <div className="py-2 text-sm font-light">Lecture Time</div>
-              <select
-                style={{ color: "black" }}
-                onChange={(event) => {
-                  obj.totalLectures =
-                    event.target.value === ""
-                      ? 0
-                      : parseFloat(event.target.value, 10);
-                  console.log(courseInputs);
-                }}
-              >
-                <option value="Select" selected>
-                  Select
-                </option>
-                <option value="1">1</option>
-                <option value="1.5">1.5</option>
-              </select>
-              {/* <input
+                {/* <input
                 type="number"
                 name="noOfLecs"
                 id="noOfLecs"
@@ -611,49 +633,50 @@ function Home() {
                 className="rounded my-3 text-center outline-none text-black w-3/5"
                 required
               /> */}
+              </div>
             </div>
+          ))}
+        </div>
+        <div className="flex flex-row">
+          <div className="w-1/6 mx-auto align-center my-3">
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            >
+              Back
+            </button>
           </div>
-        ))}
-      </div>
-
-      <div className="w-1/3 mx-auto align-center my-3">
-        <button
-          onClick={addCourseInputs}
-          className="w-full text-white bg-bck-4 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-        >
-          Add
-        </button>
+          <div className="w-1/6 mx-auto align-center my-3">
+            <button
+              onClick={addCourseInputs}
+              className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+        <div className="flex flex-col">{tbl}</div>
+        <div className={sbutt ? "w-1/3 mx-auto align-center my-3" : "hidden"}>
+          <button
+            onClick={exportPDF}
+            className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+          >
+            Print Time Table
+          </button>
+        </div>
       </div>
 
       {/* ********************************************************************************************* */}
 
-      <h5 className="text-red-500 text-center font-bold">{hinfo}</h5>
-      <div className="w-1/3 mx-auto align-center my-3">
-        <button
-          onClick={handleclick}
-          className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-        >
-          Generate
-        </button>
-      </div>
-      {allcolval}
-      <div className={sbutt ? "w-1/3 mx-auto align-center my-3" : "hidden"}>
+      {/* {allcolval} */}
+      {/* <div className={sbutt ? "w-1/3 mx-auto align-center my-3" : "hidden"}>
         <button
           onClick={crtTable}
           className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
         >
           Create Table
         </button>
-      </div>
-      <div className="flex flex-col">{tbl}</div>
-      <div className={sbutt ? "w-1/3 mx-auto align-center my-3" : "hidden"}>
-        <button
-          onClick={exportPDF}
-          className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-        >
-          Print Time Table
-        </button>
-      </div>
+      </div> */}
     </div>
   );
 }
