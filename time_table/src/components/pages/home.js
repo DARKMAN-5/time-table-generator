@@ -10,6 +10,33 @@ function Home() {
   const [timecol, setTimecol] = useState(null);
   const [sttime, setSttime] = useState("8:00");
   const [lsttime, setLsttime] = useState(null);
+
+  function courseInfo(courseCode, totalLectures, l, lPr, t, tPr, p, pPr) {
+    this.courseCode = courseCode
+    this.totalLectures = totalLectures
+    this.l = l
+    this.lPr = lPr
+    this.t = t
+    this.tPr = tPr
+    this.p = p
+    this.pPr = pPr
+  }
+
+  const tempCourseInputs = [];
+
+  for (let i = 0; i < 5; i++) {
+    let course = new courseInfo("", 0, 0, "", 0, "", 0, "");
+    tempCourseInputs.push(course);
+  }
+
+  const [courseInputs, setCourseInputs] = useState(tempCourseInputs);
+
+  const addCourseInputs = (e) => {
+    let course = new courseInfo("", 0, 0, "", 0, "", 0, "");
+    const updatedCourseInputs = [...courseInputs, course];
+    setCourseInputs(updatedCourseInputs);
+  }
+
   let days = [
     "Monday",
     "Tuesday",
@@ -320,7 +347,7 @@ function Home() {
     <div className="mx-auto my-5 w-1/2">
       <div className="bg-bck-3 text-center rounded my-3">
         <div className="pt-5 text-xl font-semibold">
-          Enter the Total number of working days in a Week
+          Total working days
         </div>
         <input
           type="number"
@@ -349,7 +376,7 @@ function Home() {
 
       <div className="bg-bck-3 text-center rounded my-3 py-2">
         <div className="pt-5 text-xl font-semibold">
-          Select lunch start time
+          Lunch start time
         </div>
         <select
           value={lunchStartTime}
@@ -364,7 +391,7 @@ function Home() {
         </select>
 
         <div className="pt-5 text-xl font-semibold">
-          Select number of lectures before lunch
+          Lectures before lunch
         </div>
         <select
           style={{ color: "black" }}
@@ -378,7 +405,7 @@ function Home() {
         </select>
 
         <div className="pt-5 text-xl font-semibold">
-          Select lecture start time
+          Lecture start time
         </div>
         <select
           style={{ color: "black" }}
@@ -395,7 +422,7 @@ function Home() {
           ))}
         </select>
 
-        <div className="pt-5 text-xl font-semibold">Select lunch end time</div>
+        <div className="pt-5 text-xl font-semibold">Lunch end time</div>
         <select
           style={{ color: "black" }}
           id="lunchEndTime"
@@ -413,7 +440,7 @@ function Home() {
         </select>
 
         <div className="pt-5 text-xl font-semibold">
-          Select number of lectures after lunch
+          Lectures after lunch
         </div>
         <select
           style={{ color: "black" }}
@@ -432,183 +459,152 @@ function Home() {
       {/* *************************************************************************************************************** */}
 
       <div className="bg-bck-3 text-center rounded my-3 py-2 mx-auto">
-        <div className="flex justify-around">
-          <div className="my-2">
-            <div className="py-2 text-sm font-light">Course Code</div>
-            <input
-              type="text"
-              name="course_code"
-              id="course_code"
-              onChange={(event) => {
-                setAllcrsinfo((prev) => {
-                  return { ...prev, coursecode: event.target.value };
-                });
-              }}
-              value={allcrsinfo.coursecode}
-              className="rounded my-3 text-center outline-none text-black w-3/5"
-              required
-            />
-          </div>
-          <div className="my-2">
-            <div className="py-2 text-sm font-light">Total Lectures</div>
-            <input
-              type="number"
-              name="noOfLecs"
-              id="noOfLecs"
-              onChange={(event) => {
-                setAllcrsinfo((prev) => {
-                  return { ...prev, noOfLecs: event.target.value };
-                });
-              }}
-              value={allcrsinfo.noOfLecs}
-              className="rounded my-3 text-center outline-none text-black w-3/5"
-              required
-            />
-          </div>
-          <div className="flex justify-evenly my-2">
-            <div className="flex flex-col mx-2">
-              <div className="py-2 text-sm font-bold">L</div>
+        {courseInputs.map(obj => (
+          <div className="flex justify-around">
+            <div className="my-2">
+              <div className="py-2 text-sm font-light">Course Code</div>
               <input
-                type="number"
-                name="lecstime"
-                id="lecstime"
+                type="text"
+                name="course_code"
+                id="course_code"
                 onChange={(event) => {
-                  setAllcrsinfo((prev) => {
-                    return {
-                      ...prev,
-                      totlec: { ...prev.totlec, time: event.target.value },
-                    };
-                  });
+                  obj.courseCode = event.target.value
                 }}
-                value={allcrsinfo.totlec.time}
-                min={1}
-                max={7}
-                className="rounded  my-3 text-center outline-none text-black"
+                className="rounded my-3 text-center outline-none text-black w-3/5"
                 required
               />
-
-              <select
-                style={{ color: "black" }}
-                value={allcrsinfo.totlec.priority}
-                onChange={(e) => {
-                  setAllcrsinfo((prev) => {
-                    return {
-                      ...prev,
-                      totlec: { ...prev.totlec, priority: e.target.value },
-                    };
-                  });
-                }}
-                id="priority"
-                name="priority"
-                className="w-full"
-              >
-                <option
-                  value="Select"
-                  selected="true"
-                  // disabled="disabled"
-                ></option>
-                <option value="morning">pre</option>
-                <option value="afternoon">post</option>
-              </select>
             </div>
-            <div className="flex flex-col mx-2">
-              <div className="py-2 text-sm font-bold">T</div>
+            <div className="my-2">
+              <div className="py-2 text-sm font-light">Total Lectures</div>
               <input
                 type="number"
-                name="tutstime"
-                id="tutstime"
+                name="noOfLecs"
+                id="noOfLecs"
                 onChange={(event) => {
-                  setAllcrsinfo((prev) => {
-                    return {
-                      ...prev,
-                      tottut: { ...prev.tottut, time: event.target.value },
-                    };
-                  });
+                  obj.totalLectures = event.target.value === "" ? 0 : parseInt(event.target.value, 10)
                 }}
-                value={allcrsinfo.tottut.time}
-                min={1}
-                max={9}
-                className=" rounded  my-3 text-center outline-none text-black"
+                defaultValue={obj.totalLectures}
+                className="rounded my-3 text-center outline-none text-black w-3/5"
                 required
               />
-
-              <select
-                style={{ color: "black" }}
-                value={allcrsinfo.tottut.priority}
-                onChange={(e) => {
-                  setAllcrsinfo((prev) => {
-                    return {
-                      ...prev,
-                      tottut: { ...prev.tottut, priority: e.target.value },
-                    };
-                  });
-                }}
-                id="priority"
-                name="priority"
-              >
-                <option
-                  value="Select"
-                  selected="true"
-                  // disabled="disabled"
-                ></option>
-                <option value="morning">pre</option>
-                <option value="afternoon">post</option>
-              </select>
             </div>
-            <div className="flex flex-col mx-2">
-              <div className="py-2 text-sm font-bold">P</div>
-              <input
-                type="number"
-                name="labtime"
-                id="labtime"
-                onChange={(event) => {
-                  setAllcrsinfo((prev) => {
-                    return {
-                      ...prev,
-                      totlab: { ...prev.totlab, time: event.target.value },
-                    };
-                  });
-                }}
-                value={allcrsinfo.totlab.time}
-                min={1}
-                max={9}
-                className=" rounded  my-3 text-center outline-none text-black"
-                required
-              />
+            <div className="flex justify-evenly my-2">
+              <div className="flex flex-col mx-2">
+                <div className="py-2 text-sm font-bold">L</div>
+                <input
+                  type="number"
+                  name="lecstime"
+                  id="lecstime"
+                  onChange={(event) => {
+                    obj.l = event.target.value === "" ? 0 : parseInt(event.target.value, 10)
+                  }}
+                  defaultValue={obj.l}
+                  min={1}
+                  max={7}
+                  className="rounded  my-3 text-center outline-none text-black"
+                  required
+                />
 
-              <select
-                style={{ color: "black" }}
-                value={allcrsinfo.totlab.priority}
-                onChange={(e) => {
-                  setAllcrsinfo((prev) => {
-                    return {
-                      ...prev,
-                      totlab: { ...prev.totlab, priority: e.target.value },
-                    };
-                  });
-                }}
-                id="priority"
-                name="priority"
-              >
-                <option
-                  value="Select"
-                  selected="true"
+                <select
+                  style={{ color: "black" }}
+                  value={allcrsinfo.totlec.priority}
+                  onChange={(e) => {
+                    obj.lPr = e.target.value
+                  }}
+                  id="priority"
+                  name="priority"
+                  className="w-full"
+                >
+                  <option
+                    value="Select"
+                    selected="true"
                   // disabled="disabled"
-                ></option>
-                <option value="morning">pre</option>
-                <option value="afternoon">post</option>
-              </select>
+                  ></option>
+                  <option value="morning">pre</option>
+                  <option value="afternoon">post</option>
+                </select>
+              </div>
+              <div className="flex flex-col mx-2">
+                <div className="py-2 text-sm font-bold">T</div>
+                <input
+                  type="number"
+                  name="tutstime"
+                  id="tutstime"
+                  onChange={(event) => {
+                    obj.t = event.target.value === "" ? 0 : parseInt(event.target.value, 10)
+                  }}
+                  defaultValue={obj.t}
+                  min={1}
+                  max={9}
+                  className=" rounded  my-3 text-center outline-none text-black"
+                  required
+                />
+
+                <select
+                  style={{ color: "black" }}
+                  value={allcrsinfo.tottut.priority}
+                  onChange={(e) => {
+                    obj.tPr = e.target.value
+                  }}
+                  id="priority"
+                  name="priority"
+                >
+                  <option
+                    value="Select"
+                    selected="true"
+                  // disabled="disabled"
+                  ></option>
+                  <option value="morning">pre</option>
+                  <option value="afternoon">post</option>
+                </select>
+              </div>
+              <div className="flex flex-col mx-2">
+                <div className="py-2 text-sm font-bold">P</div>
+                <input
+                  type="number"
+                  name="labtime"
+                  id="labtime"
+                  onChange={(event) => {
+                    obj.p = event.target.value === "" ? 0 : parseInt(event.target.value, 10)
+                  }}
+                  defaultValue={obj.p}
+                  min={1}
+                  max={9}
+                  className=" rounded  my-3 text-center outline-none text-black"
+                  required
+                />
+
+                <select
+                  style={{ color: "black" }}
+                  value={allcrsinfo.totlab.priority}
+                  onChange={(e) => {
+                    obj.pPr = e.target.value
+                  }}
+                  id="priority"
+                  name="priority"
+                >
+                  <option
+                    value="Select"
+                    selected="true"
+                  // disabled="disabled"
+                  ></option>
+                  <option value="morning">pre</option>
+                  <option value="afternoon">post</option>
+                </select>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="w-1/3 mx-auto align-center my-3">
-          <button
-            onClick={submitCourseData}
-            className="w-full text-white bg-bck-4 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-          >
-            Add
-          </button>
-        </div>
+        ))}
+
+      </div>
+
+      <div className="w-1/3 mx-auto align-center my-3">
+        <button
+          onClick={addCourseInputs}
+          className="w-full text-white bg-bck-4 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+        >
+          Add
+        </button>
       </div>
 
       {/* ********************************************************************************************* */}
