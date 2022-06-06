@@ -12,14 +12,14 @@ function Home() {
   const [lsttime, setLsttime] = useState(null);
 
   function courseInfo(courseCode, totalLectures, l, lPr, t, tPr, p, pPr) {
-    this.courseCode = courseCode
-    this.totalLectures = totalLectures
-    this.l = l
-    this.lPr = lPr
-    this.t = t
-    this.tPr = tPr
-    this.p = p
-    this.pPr = pPr
+    this.courseCode = courseCode;
+    this.totalLectures = totalLectures;
+    this.l = l;
+    this.lPr = lPr;
+    this.t = t;
+    this.tPr = tPr;
+    this.p = p;
+    this.pPr = pPr;
   }
 
   const tempCourseInputs = [];
@@ -35,7 +35,7 @@ function Home() {
     let course = new courseInfo("", 0, 0, "", 0, "", 0, "");
     const updatedCourseInputs = [...courseInputs, course];
     setCourseInputs(updatedCourseInputs);
-  }
+  };
 
   let days = [
     "Monday",
@@ -346,9 +346,7 @@ function Home() {
   return (
     <div className="mx-auto my-5 w-1/2">
       <div className="bg-bck-3 text-center rounded my-3">
-        <div className="pt-5 text-xl font-semibold">
-          Total working days
-        </div>
+        <div className="pt-5 text-xl font-semibold">Total working days</div>
         <input
           type="number"
           name="rows"
@@ -375,9 +373,7 @@ function Home() {
       </div>
 
       <div className="bg-bck-3 text-center rounded my-3 py-2">
-        <div className="pt-5 text-xl font-semibold">
-          Lunch start time
-        </div>
+        <div className="pt-5 text-xl font-semibold">Lunch start time</div>
         <select
           value={lunchStartTime}
           onChange={(e) => setLunchStartTime(e.target.value)}
@@ -390,9 +386,7 @@ function Home() {
           <option value="1:00">1:00 PM</option>
         </select>
 
-        <div className="pt-5 text-xl font-semibold">
-          Lectures before lunch
-        </div>
+        <div className="pt-5 text-xl font-semibold">Lectures before lunch</div>
         <select
           style={{ color: "black" }}
           value={lecturesBeforeLunch}
@@ -404,9 +398,7 @@ function Home() {
           <option value="4">4</option>
         </select>
 
-        <div className="pt-5 text-xl font-semibold">
-          Lecture start time
-        </div>
+        <div className="pt-5 text-xl font-semibold">Lecture start time</div>
         <select
           style={{ color: "black" }}
           id="lectureStartTime"
@@ -439,9 +431,7 @@ function Home() {
           ))}
         </select>
 
-        <div className="pt-5 text-xl font-semibold">
-          Lectures after lunch
-        </div>
+        <div className="pt-5 text-xl font-semibold">Lectures after lunch</div>
         <select
           style={{ color: "black" }}
           value={lecturesAfterLunch}
@@ -459,7 +449,7 @@ function Home() {
       {/* *************************************************************************************************************** */}
 
       <div className="bg-bck-3 text-center rounded my-3 py-2 mx-auto">
-        {courseInputs.map(obj => (
+        {courseInputs.map((obj) => (
           <div className="flex justify-around">
             <div className="my-2">
               <div className="py-2 text-sm font-light">Course Code</div>
@@ -468,26 +458,13 @@ function Home() {
                 name="course_code"
                 id="course_code"
                 onChange={(event) => {
-                  obj.courseCode = event.target.value
+                  obj.courseCode = event.target.value;
                 }}
                 className="rounded my-3 text-center outline-none text-black w-3/5"
                 required
               />
             </div>
-            <div className="my-2">
-              <div className="py-2 text-sm font-light">Total Lectures</div>
-              <input
-                type="number"
-                name="noOfLecs"
-                id="noOfLecs"
-                onChange={(event) => {
-                  obj.totalLectures = event.target.value === "" ? 0 : parseInt(event.target.value, 10)
-                }}
-                defaultValue={obj.totalLectures}
-                className="rounded my-3 text-center outline-none text-black w-3/5"
-                required
-              />
-            </div>
+
             <div className="flex justify-evenly my-2">
               <div className="flex flex-col mx-2">
                 <div className="py-2 text-sm font-bold">L</div>
@@ -496,7 +473,10 @@ function Home() {
                   name="lecstime"
                   id="lecstime"
                   onChange={(event) => {
-                    obj.l = event.target.value === "" ? 0 : parseInt(event.target.value, 10)
+                    obj.l =
+                      event.target.value === ""
+                        ? 0
+                        : parseInt(event.target.value, 10);
                   }}
                   defaultValue={obj.l}
                   min={1}
@@ -509,7 +489,7 @@ function Home() {
                   style={{ color: "black" }}
                   value={allcrsinfo.totlec.priority}
                   onChange={(e) => {
-                    obj.lPr = e.target.value
+                    obj.lPr = e.target.value;
                   }}
                   id="priority"
                   name="priority"
@@ -518,7 +498,7 @@ function Home() {
                   <option
                     value="Select"
                     selected="true"
-                  // disabled="disabled"
+                    // disabled="disabled"
                   ></option>
                   <option value="morning">pre</option>
                   <option value="afternoon">post</option>
@@ -531,7 +511,10 @@ function Home() {
                   name="tutstime"
                   id="tutstime"
                   onChange={(event) => {
-                    obj.t = event.target.value === "" ? 0 : parseInt(event.target.value, 10)
+                    obj.t =
+                      event.target.value === ""
+                        ? 0
+                        : parseInt(event.target.value, 10);
                   }}
                   defaultValue={obj.t}
                   min={1}
@@ -544,7 +527,7 @@ function Home() {
                   style={{ color: "black" }}
                   value={allcrsinfo.tottut.priority}
                   onChange={(e) => {
-                    obj.tPr = e.target.value
+                    obj.tPr = e.target.value;
                   }}
                   id="priority"
                   name="priority"
@@ -552,7 +535,7 @@ function Home() {
                   <option
                     value="Select"
                     selected="true"
-                  // disabled="disabled"
+                    // disabled="disabled"
                   ></option>
                   <option value="morning">pre</option>
                   <option value="afternoon">post</option>
@@ -565,7 +548,10 @@ function Home() {
                   name="labtime"
                   id="labtime"
                   onChange={(event) => {
-                    obj.p = event.target.value === "" ? 0 : parseInt(event.target.value, 10)
+                    obj.p =
+                      event.target.value === ""
+                        ? 0
+                        : parseInt(event.target.value, 10);
                   }}
                   defaultValue={obj.p}
                   min={1}
@@ -578,7 +564,7 @@ function Home() {
                   style={{ color: "black" }}
                   value={allcrsinfo.totlab.priority}
                   onChange={(e) => {
-                    obj.pPr = e.target.value
+                    obj.pPr = e.target.value;
                   }}
                   id="priority"
                   name="priority"
@@ -586,16 +572,48 @@ function Home() {
                   <option
                     value="Select"
                     selected="true"
-                  // disabled="disabled"
+                    // disabled="disabled"
                   ></option>
                   <option value="morning">pre</option>
                   <option value="afternoon">post</option>
                 </select>
               </div>
             </div>
+            <div className="my-2">
+              <div className="py-2 text-sm font-light">Lecture Time</div>
+              <select
+                style={{ color: "black" }}
+                onChange={(event) => {
+                  obj.totalLectures =
+                    event.target.value === ""
+                      ? 0
+                      : parseFloat(event.target.value, 10);
+                  console.log(courseInputs);
+                }}
+              >
+                <option value="Select" selected>
+                  Select
+                </option>
+                <option value="1">1</option>
+                <option value="1.5">1.5</option>
+              </select>
+              {/* <input
+                type="number"
+                name="noOfLecs"
+                id="noOfLecs"
+                onChange={(event) => {
+                  obj.totalLectures =
+                    event.target.value === ""
+                      ? 0
+                      : parseInt(event.target.value, 10);
+                }}
+                defaultValue={obj.totalLectures}
+                className="rounded my-3 text-center outline-none text-black w-3/5"
+                required
+              /> */}
+            </div>
           </div>
         ))}
-
       </div>
 
       <div className="w-1/3 mx-auto align-center my-3">
