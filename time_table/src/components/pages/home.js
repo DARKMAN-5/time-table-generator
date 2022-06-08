@@ -11,6 +11,7 @@ function Home() {
   const [sttime, setSttime] = useState("8:00");
   const [lsttime, setLsttime] = useState(null);
   const [lead, setLead] = useState(0);
+  const [oallp, setOallp] = useState(null);
 
   function courseInfo(courseCode, totalLectures, l, lPr, t, tPr, p, pPr) {
     this.courseCode = courseCode;
@@ -25,7 +26,7 @@ function Home() {
 
   const tempCourseInputs = [];
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 6; i++) {
     let course = new courseInfo("", 0, 0, "", 0, "", 0, "");
     tempCourseInputs.push(course);
   }
@@ -48,20 +49,11 @@ function Home() {
   ];
 
   const [allcol, setAllcol] = useState([]);
-  // const [allinpcrs, setAllinpcrs] = useState([]);
   const [lunchStartTime, setLunchStartTime] = useState("12:30");
   const [lecturesBeforeLunch, setLecturesBeforeLunch] = useState("3");
   const [lectureStartTimes, setLectureStartTimes] = useState([]);
   const [lunchEndTimes, setLunchEndTimes] = useState([]);
   const [lecturesAfterLunch, setLecturesAfterLunch] = useState("3");
-
-  // const [allcrsinfo, setAllcrsinfo] = useState({
-  //   coursecode: "",
-  //   noOfLecs: 0,
-  //   totlec: { time: 0, priority: null },
-  //   tottut: { time: 0, priority: null },
-  //   totlab: { time: 0, priority: null },
-  // });
 
   const setPossibleStartTimes = () => {
     const arr = [];
@@ -136,10 +128,6 @@ function Home() {
     setPossibleLunchEndTimes();
   }, [lunchStartTime]);
 
-  // console.log(timecol);
-
-  // const maxtem = 1050;
-
   let [info, setInfo] = useState(null);
 
   console.log(allcol);
@@ -202,18 +190,6 @@ function Home() {
       </div>
     );
   });
-
-  // console.log(allinpcrs);
-  // let submitCourseData = () => {
-  //   setAllinpcrs((prev) => [...prev, allcrsinfo]);
-  //   setAllcrsinfo({
-  //     coursecode: "",
-  //     noOfLecs: 0,
-  //     totlec: { time: 0, priority: 0 },
-  //     tottut: { time: 0, priority: 0 },
-  //     totlab: { time: 0, priority: 0 },
-  //   });
-  // };
 
   let exportPDF = () => {
     const unit = "pt";
@@ -302,46 +278,158 @@ function Home() {
 
   console.log(sttime, lsttime);
 
+  // const [rem, setRem] = useState(0);
+
   useEffect(() => {
     crtTable();
   }, [lead]);
+
+  // console.log("Rem", rem);
 
   function handleclick() {
     setInfo(null);
 
     let ls = [];
     let cls = [];
+    let rem = 0;
+    let tst;
+    if (oallp === "mor") {
+      tst = sttime;
+      let mst = lunchStartTime;
+      let splitTime1 = tst.split(":");
+      let splitTime2 = mst.split(":");
+      let splitTime1Hr = parseInt(splitTime1[0]) * 60;
+      splitTime1Hr += parseInt(splitTime1[1]);
 
-    let tst = sttime;
+      let splitTime2Hr = parseInt(splitTime2[0]);
+
+      if (splitTime2Hr >= 1 && splitTime2Hr <= 6) {
+        splitTime2Hr = (splitTime2Hr + 12) * 60;
+      } else {
+        splitTime2Hr = splitTime2Hr * 60;
+      }
+      splitTime2Hr += parseInt(splitTime2[1]);
+      rem = splitTime2Hr - splitTime1Hr;
+      rem -= lecturesBeforeLunch * 60;
+    }
+
+    tst = sttime;
+    let lbt = "";
     for (let i = 0; i < lecturesBeforeLunch; i++) {
-      ls.push(null);
-      const splitTime = tst.split(":");
+      let splitTime = tst.split(":");
       let splitTimeHr = parseInt(splitTime[0]);
-      const splitTimeMin = parseInt(splitTime[1]);
+      let splitTimeMin = parseInt(splitTime[1]);
+
+      if (i === 2 && oallp === "mor" && rem !== 0) {
+        let brk = 15;
+        if (rem >= 90) {
+          brk = 30;
+          rem -= 30;
+        } else {
+          rem -= 15;
+        }
+
+        splitTimeMin = splitTimeMin + brk;
+        if (splitTimeMin >= 60) {
+          splitTimeMin = splitTimeMin % 60;
+          splitTimeHr++;
+        }
+
+        let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
+        let nst = tst + "-" + splitTimeHr + ":" + min;
+        tst = splitTimeHr + ":" + min;
+        cls.push(nst);
+        ls.push("Break");
+        splitTime = tst.split(":");
+        splitTimeHr = parseInt(splitTime[0]);
+        splitTimeMin = parseInt(splitTime[1]);
+      }
 
       splitTimeHr = splitTimeHr + 1;
       let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
       let nst = tst + "-" + splitTimeHr + ":" + min;
       tst = splitTimeHr + ":" + min;
       cls.push(nst);
+      ls.push(null);
     }
 
-    tst = lunchStartTime + "-" + lsttime;
+    // if (rem !== 0 && oallp === "mor") {
+    //   let mst = lunchStartTime;
+    //   let splitTime2 = mst.split(":");
+    //   let splitTime2Hr = parseInt(splitTime2[0]);
+
+    //   if (splitTime2Hr >= 1 && splitTime2Hr <= 6) {
+    //     splitTime2Hr = (splitTime2Hr + 12) * 60;
+    //   } else {
+    //     splitTime2Hr = splitTime2Hr * 60;
+    //   }
+    //   splitTime2Hr += parseInt(splitTime2[1]);
+    //   let tem = splitTime2Hr - rem;
+    //   let hrs = parseInt(tem / 60);
+    //   let min = tem % 60;
+    //   if (hrs > 12) {
+    //     hrs -= 12;
+    //   }
+    //   mst = hrs + ":" + min;
+    //   tst = mst + "-" + lsttime;
+    //   cls.push(tst);
+    //   ls.push("Lunch");
+    // } else {
+    //   let mst = lunchStartTime;
+    //   let splitTime2 = mst.split(":");
+    //   let splitTime2Hr = parseInt(splitTime2[0]);
+
+    //   if (splitTime2Hr >= 1 && splitTime2Hr <= 6) {
+    //     splitTime2Hr = (splitTime2Hr + 12) * 60;
+    //   } else {
+    //     splitTime2Hr = splitTime2Hr * 60;
+    //   }
+
+    //   splitTime2Hr += parseInt(splitTime2[1]);
+    //   let tem = splitTime2Hr - rem;
+    //   let hrs = parseInt(tem / 60);
+    //   let min = tem % 60;
+    //   if (hrs > 12) {
+    //     hrs -= 12;
+    //   }
+    //   mst = hrs + ":" + min;
+    //   tst = mst + "-" + lsttime;
+    //   cls.push(tst);
+    //   ls.push("Lunch");
+    // }
+
+    tst = tst + "-" + lsttime;
     cls.push(tst);
     ls.push("Lunch");
 
     tst = lsttime;
     for (let i = 0; i < lecturesAfterLunch; i++) {
-      ls.push(null);
-      const splitTime = tst.split(":");
+      let splitTime = tst.split(":");
       let splitTimeHr = parseInt(splitTime[0]);
       let splitTimeMin = parseInt(splitTime[1]);
+
+      if (i === 2 && oallp === "aft") {
+        splitTimeMin = splitTimeMin + 15;
+        if (splitTimeMin >= 60) {
+          splitTimeMin = splitTimeMin % 60;
+          splitTimeHr++;
+        }
+        let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
+        let nst = tst + "-" + splitTimeHr + ":" + min;
+        tst = splitTimeHr + ":" + min;
+        cls.push(nst);
+        ls.push("Break");
+        splitTime = tst.split(":");
+        splitTimeHr = parseInt(splitTime[0]);
+        splitTimeMin = parseInt(splitTime[1]);
+      }
 
       splitTimeHr = splitTimeHr + 1;
       let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
       let nst = tst + "-" + splitTimeHr + ":" + min;
       tst = splitTimeHr + ":" + min;
       cls.push(nst);
+      ls.push(null);
     }
 
     setTimecol(cls);
@@ -354,7 +442,7 @@ function Home() {
   }
 
   return (
-    <div className="mx-auto my-5 w-10/12">
+    <div className="mx-auto my-5 w-full">
       <div className={lead === 0 ? "block w-2/3 mx-auto" : "hidden"}>
         <div className="bg-bck-3 text-center rounded my-3">
           <div className="pt-5 text-xl font-semibold">Total working days</div>
@@ -376,7 +464,7 @@ function Home() {
             value={rows}
             min={1}
             max={7}
-            className="placeholder-teal-400 border border-teal-500 rounded  my-3 text-center outline-none text-black"
+            className="rounded  my-3 text-center outline-none text-black"
             required
           />
           {/* {rows} */}
@@ -456,6 +544,22 @@ function Home() {
             <option value="3">3</option>
             <option value="4">4</option>
           </select>
+          <div className="pt-5 text-xl font-semibold">Priority</div>
+          <select
+            style={{ color: "black" }}
+            value={oallp}
+            onChange={(e) => {
+              setOallp(e.target.value);
+            }}
+            id="oallp"
+            name="oallp"
+          >
+            <option value="Selected" selected="true" disabled="disabled">
+              Select
+            </option>
+            <option value="mor">Morning</option>
+            <option value="aft">Afternoon</option>
+          </select>
         </div>
 
         <div className="w-1/3 mx-auto align-center my-3">
@@ -470,10 +574,10 @@ function Home() {
 
       {/* *************************************************************************************************************** */}
       <div className={lead === 1 ? "block" : "hidden"}>
-        <div className=" flex flex-row flex-wrap">
+        <div className=" flex flex-row flex-wrap justify-evenly">
           {courseInputs.map((obj) => (
-            <div className="flex flex-col justify-around bg-bck-3 text-center rounded my-3 py-2 mx-auto">
-              <div className="mt-1">
+            <div className="flex flex-row justify-evenly bg-bck-3 text-center rounded mb-1 py-2 w-1/4 mx-1">
+              <div className="w-full mx-1">
                 <div className="text-sm font-light">Course Code</div>
                 <input
                   type="text"
@@ -482,14 +586,14 @@ function Home() {
                   onChange={(event) => {
                     obj.courseCode = event.target.value;
                   }}
-                  className="rounded mt-1 text-center outline-none text-black w-3/5"
+                  className="rounded text-center outline-none text-black w-2/4"
                   required
                 />
               </div>
 
-              <div className="flex justify-evenly my-2">
+              <div className="flex justify-evenly">
                 <div className="flex flex-col mx-2">
-                  <div className="py-2 text-sm font-bold">L</div>
+                  <div className=" text-sm font-bold">L</div>
                   <input
                     type="number"
                     name="lecstime"
@@ -503,7 +607,7 @@ function Home() {
                     defaultValue={obj.l}
                     min={1}
                     max={7}
-                    className="rounded  my-1 text-center outline-none text-black"
+                    className="rounded mb-1 text-center outline-none text-black"
                     required
                   />
 
@@ -527,7 +631,7 @@ function Home() {
                   </select>
                 </div>
                 <div className="flex flex-col">
-                  <div className="py-2 text-sm font-bold">T</div>
+                  <div className="text-sm font-bold">T</div>
                   <input
                     type="number"
                     name="tutstime"
@@ -541,7 +645,7 @@ function Home() {
                     defaultValue={obj.t}
                     min={1}
                     max={9}
-                    className=" rounded  my-1 text-center outline-none text-black"
+                    className="rounded  mb-1 text-center outline-none text-black"
                     required
                   />
 
@@ -564,7 +668,7 @@ function Home() {
                   </select>
                 </div>
                 <div className="flex flex-col mx-2">
-                  <div className="py-2 text-sm font-bold">P</div>
+                  <div className="text-sm font-bold">P</div>
                   <input
                     type="number"
                     name="labtime"
@@ -578,7 +682,7 @@ function Home() {
                     defaultValue={obj.p}
                     min={1}
                     max={9}
-                    className=" rounded  my-1 text-center outline-none text-black"
+                    className="rounded mb-1 text-center outline-none text-black"
                     required
                   />
 
@@ -601,8 +705,8 @@ function Home() {
                   </select>
                 </div>
               </div>
-              <div className="my-2">
-                <div className="py-2 text-sm font-light">Lecture Time</div>
+              <div className="mx-1 w-full">
+                <div className="text-sm font-light mx-2">Lecture Time</div>
                 <select
                   style={{ color: "black" }}
                   onChange={(event) => {
@@ -619,20 +723,6 @@ function Home() {
                   <option value="1">1</option>
                   <option value="1.5">1.5</option>
                 </select>
-                {/* <input
-                type="number"
-                name="noOfLecs"
-                id="noOfLecs"
-                onChange={(event) => {
-                  obj.totalLectures =
-                    event.target.value === ""
-                      ? 0
-                      : parseInt(event.target.value, 10);
-                }}
-                defaultValue={obj.totalLectures}
-                className="rounded my-3 text-center outline-none text-black w-3/5"
-                required
-              /> */}
               </div>
             </div>
           ))}
@@ -655,7 +745,7 @@ function Home() {
             </button>
           </div>
         </div>
-        <div className="flex flex-col">{tbl}</div>
+        <div className="flex flex-col w-3/5 mx-auto">{tbl}</div>
         <div className={sbutt ? "w-1/3 mx-auto align-center my-3" : "hidden"}>
           <button
             onClick={exportPDF}
@@ -667,16 +757,6 @@ function Home() {
       </div>
 
       {/* ********************************************************************************************* */}
-
-      {/* {allcolval} */}
-      {/* <div className={sbutt ? "w-1/3 mx-auto align-center my-3" : "hidden"}>
-        <button
-          onClick={crtTable}
-          className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-        >
-          Create Table
-        </button>
-      </div> */}
     </div>
   );
 }
