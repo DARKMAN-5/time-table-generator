@@ -322,7 +322,7 @@ function Home() {
 
       if (i === 2 && oallp === "mor" && rem !== 0) {
         let brk = 15;
-        if (rem >= 90) {
+        if (rem >= 60) {
           brk = 30;
           rem -= 30;
         } else {
@@ -346,6 +346,9 @@ function Home() {
       }
 
       splitTimeHr = splitTimeHr + 1;
+      if (splitTimeHr > 12) {
+        splitTimeHr -= 12;
+      }
       let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
       let nst = tst + "-" + splitTimeHr + ":" + min;
       tst = splitTimeHr + ":" + min;
