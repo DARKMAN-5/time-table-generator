@@ -132,65 +132,6 @@ function Home() {
 
   console.log(allcol);
 
-  let colval = allcol.map((item, index) => {
-    return allcol[index].map((item1, index1) => {
-      if (allcol[index][index1] !== "Lunch") {
-        return (
-          <div
-            id={index + "" + index1}
-            className="bg-bck-3 my-3 w-5/6 mx-auto rounded text-center"
-          >
-            <div className=" flex justify-around custom-select">
-              <h4 className="inline-block font-semibold my-5">
-                Slots [{timecol[index1]}]{" "}
-              </h4>
-              <select
-                onChange={(event) => {
-                  setAllcol((prev) => {
-                    console.log("ev : ", event);
-                    return Object.values({
-                      ...prev,
-                      [index]: Object.values({
-                        ...prev[index],
-                        [index1]: event.target.value,
-                      }),
-                    });
-                  });
-                }}
-                className="placeholder-teal-400 border border-teal-500 rounded w-28 my-5 text-center outline-none text-blue-700"
-              >
-                <option selected="true" disabled="disabled" value="0">
-                  Slot Type
-                </option>
-                <option value="Class">Class</option>
-                <option value="Lab">Lab</option>
-              </select>
-            </div>
-          </div>
-        );
-      }
-
-      return null;
-    });
-  });
-
-  let allcolval = allcol.map((item, index) => {
-    return (
-      <div
-        className="group mx-auto bg-bck-2 my-3 rounded py-4"
-        id={index + "allcol"}
-      >
-        <h2 className="text-center text-lg font-bold">{days[index]}</h2>
-        <div className="hidden group-hover:block ">
-          <div>
-            {colval[index]}
-            <h5 className="text-red-500 text-center font-bold">{info}</h5>
-          </div>
-        </div>
-      </div>
-    );
-  });
-
   let exportPDF = () => {
     const unit = "pt";
     const size = "A4"; // Use A1, A2, A3 or A4
@@ -314,138 +255,225 @@ function Home() {
     }
 
     tst = sttime;
-    let lbt = "";
+    for (let i = 0; i < lecturesBeforeLunch; i++) {
+      let splitTime = tst.split(":");
+      let splitTimeHr = parseInt(splitTime[0]);
+      let splitTimeMin = parseInt(splitTime[1]);
 
-    const slotsArr = [[1, 5, 6, 3, 7], [2, 1, 7, 4], [3, 2, 6, 5], [4, 3, 7, 1], [5, 4, 6, 2]];
-
-    let flag = true;
-    let tempRem = rem;
-
-    for (let j = 0; j < slotsArr.length; j++) {
-      let tempLs = [];
-
-      rem = tempRem;
-      for (let i = 0; i < lecturesBeforeLunch; i++) {
-        let splitTime = tst.split(":");
-        let splitTimeHr = parseInt(splitTime[0]);
-        let splitTimeMin = parseInt(splitTime[1]);
-
-        if (i === 2 && oallp === "mor" && rem !== 0) {
-          let brk = 15;
-          if (rem >= 60) {
-            brk = 30;
-            rem -= 30;
-          } else {
-            rem -= 15;
-          }
-
-          splitTimeMin = splitTimeMin + brk;
-          if (splitTimeMin >= 60) {
-            splitTimeMin = splitTimeMin % 60;
-            splitTimeHr++;
-          }
-
-          if (flag) {
-            let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
-            let nst = tst + "-" + splitTimeHr + ":" + min;
-            tst = splitTimeHr + ":" + min;
-
-            cls.push(nst);
-          }
-
-          tempLs.push("Break");
-          tempLs.push(slotsArr[j][3]);
-          splitTime = tst.split(":");
-          splitTimeHr = parseInt(splitTime[0]);
-          splitTimeMin = parseInt(splitTime[1]);
+      if (i === 2 && oallp === "mor" && rem !== 0) {
+        let brk = 15;
+        if (rem >= 60) {
+          brk = 30;
+          rem -= 30;
+        } else {
+          rem -= 15;
         }
 
-        if (i == 0 || i == 1) {
-          tempLs.push(slotsArr[j][i]);
+        splitTimeMin = splitTimeMin + brk;
+        if (splitTimeMin >= 60) {
+          splitTimeMin = splitTimeMin % 60;
+          splitTimeHr++;
         }
 
-        splitTimeHr = splitTimeHr + 1;
-        if (splitTimeHr > 12) {
-          splitTimeHr -= 12;
-        }
-
-        if (flag) {
-          let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
-          let nst = tst + "-" + splitTimeHr + ":" + min;
-          tst = splitTimeHr + ":" + min;
-          cls.push(nst);
-        }
+        let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
+        let nst = tst + "-" + splitTimeHr + ":" + min;
+        tst = splitTimeHr + ":" + min;
+        cls.push(nst);
+        ls.push("Break");
+        splitTime = tst.split(":");
+        splitTimeHr = parseInt(splitTime[0]);
+        splitTimeMin = parseInt(splitTime[1]);
       }
 
-      if (flag) {
-        tst = tst + "-" + lsttime;
-        cls.push(tst);
+      splitTimeHr = splitTimeHr + 1;
+      if (splitTimeHr > 12) {
+        splitTimeHr -= 12;
+      }
+      let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
+      let nst = tst + "-" + splitTimeHr + ":" + min;
+      tst = splitTimeHr + ":" + min;
+      cls.push(nst);
+      ls.push(null);
+    }
+
+    tst = tst + "-" + lsttime;
+    cls.push(tst);
+    ls.push("Lunch");
+
+    tst = lsttime;
+    for (let i = 0; i < lecturesAfterLunch; i++) {
+      let splitTime = tst.split(":");
+      let splitTimeHr = parseInt(splitTime[0]);
+      let splitTimeMin = parseInt(splitTime[1]);
+
+      if (i === 2 && oallp === "aft") {
+        splitTimeMin = splitTimeMin + 15;
+        if (splitTimeMin >= 60) {
+          splitTimeMin = splitTimeMin % 60;
+          splitTimeHr++;
+        }
+        let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
+        let nst = tst + "-" + splitTimeHr + ":" + min;
+        tst = splitTimeHr + ":" + min;
+        cls.push(nst);
+        ls.push("Break");
+        splitTime = tst.split(":");
+        splitTimeHr = parseInt(splitTime[0]);
+        splitTimeMin = parseInt(splitTime[1]);
       }
 
-      tempLs.push("Lunch");
-
-      tst = lsttime;
-      for (let i = 0; i < lecturesAfterLunch; i++) {
-        let splitTime = tst.split(":");
-        let splitTimeHr = parseInt(splitTime[0]);
-        let splitTimeMin = parseInt(splitTime[1]);
-
-        if (i === 2 && oallp === "aft") {
-          splitTimeMin = splitTimeMin + 15;
-          if (splitTimeMin >= 60) {
-            splitTimeMin = splitTimeMin % 60;
-            splitTimeHr++;
-          }
-
-          if (flag) {
-            let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
-            let nst = tst + "-" + splitTimeHr + ":" + min;
-            tst = splitTimeHr + ":" + min;
-            cls.push(nst);
-          }
-
-          tempLs.push("Break");
-          splitTime = tst.split(":");
-          splitTimeHr = parseInt(splitTime[0]);
-          splitTimeMin = parseInt(splitTime[1]);
-        }
-
-        if (flag) {
-          splitTimeHr = splitTimeHr + 1;
-          let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
-          let nst = tst + "-" + splitTimeHr + ":" + min;
-          tst = splitTimeHr + ":" + min;
-          cls.push(nst);
-        }
-
-        if (i == 0) {
-          tempLs.push(slotsArr[j][2]);
-        } else if(i==1 && j==0)
-        {
-          tempLs.push(slotsArr[j][4]);
-        }else{
-          tempLs.push(null);
-        }
-      }
-
-      ls.push(tempLs);
-
-      if (j == 0) {
-        flag = false;
-      }
+      splitTimeHr = splitTimeHr + 1;
+      let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
+      let nst = tst + "-" + splitTimeHr + ":" + min;
+      tst = splitTimeHr + ":" + min;
+      cls.push(nst);
+      ls.push(null);
     }
 
     setTimecol(cls);
-    setAllcol(ls);
+    setAllcol([]);
+
+    if (lecturesBeforeLunch === "4") {
+      const slots4bfl = [
+        [1, 5, 6, 3, 7],
+        [2, 1, 7, 4],
+        [3, 2, 6, 5],
+        [4, 3, 7, 1],
+        [5, 4, 6, 2],
+      ];
+      for (let i = 0; i < rows; i++) {
+        let nls = [...ls];
+        // console.log("Before", nls);
+        let j = 0;
+        for (let k = 0; k < slots4bfl[i].length; k++) {
+          while (nls[j] !== null) {
+            j++;
+          }
+          nls[j] = slots4bfl[i][k];
+          j++;
+        }
+        // console.log("After", nls);
+        setAllcol((prev) => [...prev, nls]);
+      }
+    } else {
+      const slots4bfl = [
+        [1, 5, 3, 6, 7],
+        [2, 1, 4, 7],
+        [3, 2, 5, 6],
+        [4, 3, 1, 7],
+        [5, 4, 2, 6],
+      ];
+      for (let i = 0; i < rows; i++) {
+        let nls = [...ls];
+        // console.log("Before", nls);
+        let j = 0;
+        for (let k = 0; k < slots4bfl[i].length; k++) {
+          while (nls[j] !== null) {
+            j++;
+          }
+          nls[j] = slots4bfl[i][k];
+          j++;
+        }
+        // console.log("After", nls);
+        setAllcol((prev) => [...prev, nls]);
+      }
+    }
 
     setSbutt(true);
     setLead(1);
   }
 
+  console.log(allcol);
+  let remmm = 1;
+
+  // console.log("idx", courseInputs[0].l);
+  // console.log(typeof lecturesBeforeLunch);
+  //  function courseInfo(courseCode, totalLectures, l, lPr, t, tPr, p, pPr) {
+  //    this.courseCode = courseCode;
+  //    this.totalLectures = totalLectures;
+  //    this.l = l;
+  //    this.lPr = lPr;
+  //    this.t = t;
+  //    this.tPr = tPr;
+  //    this.p = p;
+  //    this.pPr = pPr;
+  //  }
+  const updateTT = () => {
+    let distribution = { L: {}, T: {}, P: {} };
+    let lectslot = { L: new Set(), T: new Set(), P: new Set() };
+    for (let i = 0; i < courseInputs.length; i++) {
+      if (courseInputs[i].courseCode !== "") {
+        if (courseInputs[i].l !== 0) {
+          lectslot.L.add(courseInputs[i].l);
+          if (distribution.L[courseInputs[i].l] !== undefined) {
+            distribution.L[courseInputs[i].l].push(courseInputs[i].courseCode);
+          } else {
+            distribution.L[courseInputs[i].l] = [courseInputs[i].courseCode];
+          }
+        }
+
+        if (courseInputs[i].t !== 0) {
+          lectslot.T.add(courseInputs[i].t);
+
+          if (distribution.T[courseInputs[i].t] !== undefined) {
+            distribution.T[courseInputs[i].t].push(courseInputs[i].courseCode);
+          } else {
+            distribution.T[courseInputs[i].t] = [courseInputs[i].courseCode];
+          }
+        }
+
+        if (courseInputs[i].p !== 0) {
+          lectslot.P.add(courseInputs[i].p);
+          if (distribution.P[courseInputs[i].p] !== undefined) {
+            distribution.P[courseInputs[i].t].push(courseInputs[i].courseCode);
+          } else {
+            distribution.P[courseInputs[i].t] = [courseInputs[i].courseCode];
+          }
+        }
+      }
+    }
+
+    console.log("dist", distribution);
+
+    let uniquearray = Array.from(lectslot.L);
+    uniquearray.sort((a, b) => a - b);
+    uniquearray = uniquearray.reverse();
+    console.log("unique", uniquearray);
+    let dict = {};
+    for (let i = 0; i < uniquearray.length; i++) {
+      for (let j = 0; j < distribution.L[uniquearray[i]].length; j++) {
+        dict[remmm] = [distribution.L[uniquearray[i]][j], uniquearray[i]];
+        remmm++;
+      }
+    }
+
+    console.log("Dict", dict);
+
+    let copyallcol = [...allcol];
+
+    for (let i = 0; i < copyallcol[0].length; i++) {
+      for (let j = 0; j < copyallcol.length; j++) {
+        if (copyallcol[j][i] !== null && dict[copyallcol[j][i]] !== undefined) {
+          if (dict[copyallcol[j][i]][1] > 0) {
+            dict[copyallcol[j][i]][1]--;
+            copyallcol[j][i] = dict[copyallcol[j][i]][0];
+          } else {
+            copyallcol[j][i] = null;
+          }
+        }
+      }
+    }
+
+    console.log(allcol);
+
+    setAllcol(copyallcol);
+    setLead((prev) => prev + 1);
+  };
+
   return (
     <div className="mx-auto my-5 w-full">
-      <div className={lead === 0 ? "block w-2/3 mx-auto" : "hidden"}>
-        <div className="bg-bck-3 text-center rounded my-3">
+      <div className={lead === 0 ? "block w-2/3 mx-auto my-16" : "hidden"}>
+        <div className="bg-bck-3 text-center rounded ">
           <div className="pt-5 text-xl font-semibold">Total working days</div>
           <input
             type="number"
@@ -574,7 +602,7 @@ function Home() {
       </div>
 
       {/* *************************************************************************************************************** */}
-      <div className={lead === 1 ? "block" : "hidden"}>
+      <div className={lead !== 0 ? "block" : "hidden"}>
         <div className=" flex flex-row flex-wrap justify-evenly">
           {courseInputs.map((obj) => (
             <div className="flex flex-row justify-evenly bg-bck-3 text-center rounded mb-1 py-2 w-1/4 mx-1">
@@ -614,7 +642,6 @@ function Home() {
 
                   <select
                     style={{ color: "black" }}
-                    value={obj.lPr}
                     onChange={(e) => {
                       obj.lPr = e.target.value;
                     }}
@@ -625,7 +652,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                    // disabled="disabled"
+                      // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
@@ -652,7 +679,6 @@ function Home() {
 
                   <select
                     style={{ color: "black" }}
-                    value={obj.tPr}
                     onChange={(e) => {
                       obj.tPr = e.target.value;
                     }}
@@ -662,7 +688,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                    // disabled="disabled"
+                      // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
@@ -689,7 +715,6 @@ function Home() {
 
                   <select
                     style={{ color: "black" }}
-                    value={obj.pPr}
                     onChange={(e) => {
                       obj.pPr = e.target.value;
                     }}
@@ -699,7 +724,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                    // disabled="disabled"
+                      // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
@@ -735,6 +760,14 @@ function Home() {
               className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
             >
               Back
+            </button>
+          </div>
+          <div className="w-1/6 mx-auto align-center my-3">
+            <button
+              onClick={updateTT}
+              className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            >
+              Update
             </button>
           </div>
           <div className="w-1/6 mx-auto align-center my-3">
