@@ -315,131 +315,129 @@ function Home() {
 
     tst = sttime;
     let lbt = "";
-    for (let i = 0; i < lecturesBeforeLunch; i++) {
-      let splitTime = tst.split(":");
-      let splitTimeHr = parseInt(splitTime[0]);
-      let splitTimeMin = parseInt(splitTime[1]);
 
-      if (i === 2 && oallp === "mor" && rem !== 0) {
-        let brk = 15;
-        if (rem >= 60) {
-          brk = 30;
-          rem -= 30;
-        } else {
-          rem -= 15;
+    const slotsArr = [[1, 5, 6, 3, 7], [2, 1, 7, 4], [3, 2, 6, 5], [4, 3, 7, 1], [5, 4, 6, 2]];
+
+    let flag = true;
+    let tempRem = rem;
+
+    for (let j = 0; j < slotsArr.length; j++) {
+      let tempLs = [];
+
+      rem = tempRem;
+      for (let i = 0; i < lecturesBeforeLunch; i++) {
+        let splitTime = tst.split(":");
+        let splitTimeHr = parseInt(splitTime[0]);
+        let splitTimeMin = parseInt(splitTime[1]);
+
+        if (i === 2 && oallp === "mor" && rem !== 0) {
+          let brk = 15;
+          if (rem >= 60) {
+            brk = 30;
+            rem -= 30;
+          } else {
+            rem -= 15;
+          }
+
+          splitTimeMin = splitTimeMin + brk;
+          if (splitTimeMin >= 60) {
+            splitTimeMin = splitTimeMin % 60;
+            splitTimeHr++;
+          }
+
+          if (flag) {
+            let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
+            let nst = tst + "-" + splitTimeHr + ":" + min;
+            tst = splitTimeHr + ":" + min;
+
+            cls.push(nst);
+          }
+
+          tempLs.push("Break");
+          tempLs.push(slotsArr[j][3]);
+          splitTime = tst.split(":");
+          splitTimeHr = parseInt(splitTime[0]);
+          splitTimeMin = parseInt(splitTime[1]);
         }
 
-        splitTimeMin = splitTimeMin + brk;
-        if (splitTimeMin >= 60) {
-          splitTimeMin = splitTimeMin % 60;
-          splitTimeHr++;
+        if (i == 0 || i == 1) {
+          tempLs.push(slotsArr[j][i]);
         }
 
-        let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
-        let nst = tst + "-" + splitTimeHr + ":" + min;
-        tst = splitTimeHr + ":" + min;
-        cls.push(nst);
-        ls.push("Break");
-        splitTime = tst.split(":");
-        splitTimeHr = parseInt(splitTime[0]);
-        splitTimeMin = parseInt(splitTime[1]);
-      }
-
-      splitTimeHr = splitTimeHr + 1;
-      if (splitTimeHr > 12) {
-        splitTimeHr -= 12;
-      }
-      let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
-      let nst = tst + "-" + splitTimeHr + ":" + min;
-      tst = splitTimeHr + ":" + min;
-      cls.push(nst);
-      ls.push(null);
-    }
-
-    // if (rem !== 0 && oallp === "mor") {
-    //   let mst = lunchStartTime;
-    //   let splitTime2 = mst.split(":");
-    //   let splitTime2Hr = parseInt(splitTime2[0]);
-
-    //   if (splitTime2Hr >= 1 && splitTime2Hr <= 6) {
-    //     splitTime2Hr = (splitTime2Hr + 12) * 60;
-    //   } else {
-    //     splitTime2Hr = splitTime2Hr * 60;
-    //   }
-    //   splitTime2Hr += parseInt(splitTime2[1]);
-    //   let tem = splitTime2Hr - rem;
-    //   let hrs = parseInt(tem / 60);
-    //   let min = tem % 60;
-    //   if (hrs > 12) {
-    //     hrs -= 12;
-    //   }
-    //   mst = hrs + ":" + min;
-    //   tst = mst + "-" + lsttime;
-    //   cls.push(tst);
-    //   ls.push("Lunch");
-    // } else {
-    //   let mst = lunchStartTime;
-    //   let splitTime2 = mst.split(":");
-    //   let splitTime2Hr = parseInt(splitTime2[0]);
-
-    //   if (splitTime2Hr >= 1 && splitTime2Hr <= 6) {
-    //     splitTime2Hr = (splitTime2Hr + 12) * 60;
-    //   } else {
-    //     splitTime2Hr = splitTime2Hr * 60;
-    //   }
-
-    //   splitTime2Hr += parseInt(splitTime2[1]);
-    //   let tem = splitTime2Hr - rem;
-    //   let hrs = parseInt(tem / 60);
-    //   let min = tem % 60;
-    //   if (hrs > 12) {
-    //     hrs -= 12;
-    //   }
-    //   mst = hrs + ":" + min;
-    //   tst = mst + "-" + lsttime;
-    //   cls.push(tst);
-    //   ls.push("Lunch");
-    // }
-
-    tst = tst + "-" + lsttime;
-    cls.push(tst);
-    ls.push("Lunch");
-
-    tst = lsttime;
-    for (let i = 0; i < lecturesAfterLunch; i++) {
-      let splitTime = tst.split(":");
-      let splitTimeHr = parseInt(splitTime[0]);
-      let splitTimeMin = parseInt(splitTime[1]);
-
-      if (i === 2 && oallp === "aft") {
-        splitTimeMin = splitTimeMin + 15;
-        if (splitTimeMin >= 60) {
-          splitTimeMin = splitTimeMin % 60;
-          splitTimeHr++;
+        splitTimeHr = splitTimeHr + 1;
+        if (splitTimeHr > 12) {
+          splitTimeHr -= 12;
         }
-        let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
-        let nst = tst + "-" + splitTimeHr + ":" + min;
-        tst = splitTimeHr + ":" + min;
-        cls.push(nst);
-        ls.push("Break");
-        splitTime = tst.split(":");
-        splitTimeHr = parseInt(splitTime[0]);
-        splitTimeMin = parseInt(splitTime[1]);
+
+        if (flag) {
+          let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
+          let nst = tst + "-" + splitTimeHr + ":" + min;
+          tst = splitTimeHr + ":" + min;
+          cls.push(nst);
+        }
       }
 
-      splitTimeHr = splitTimeHr + 1;
-      let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
-      let nst = tst + "-" + splitTimeHr + ":" + min;
-      tst = splitTimeHr + ":" + min;
-      cls.push(nst);
-      ls.push(null);
+      if (flag) {
+        tst = tst + "-" + lsttime;
+        cls.push(tst);
+      }
+
+      tempLs.push("Lunch");
+
+      tst = lsttime;
+      for (let i = 0; i < lecturesAfterLunch; i++) {
+        let splitTime = tst.split(":");
+        let splitTimeHr = parseInt(splitTime[0]);
+        let splitTimeMin = parseInt(splitTime[1]);
+
+        if (i === 2 && oallp === "aft") {
+          splitTimeMin = splitTimeMin + 15;
+          if (splitTimeMin >= 60) {
+            splitTimeMin = splitTimeMin % 60;
+            splitTimeHr++;
+          }
+
+          if (flag) {
+            let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
+            let nst = tst + "-" + splitTimeHr + ":" + min;
+            tst = splitTimeHr + ":" + min;
+            cls.push(nst);
+          }
+
+          tempLs.push("Break");
+          splitTime = tst.split(":");
+          splitTimeHr = parseInt(splitTime[0]);
+          splitTimeMin = parseInt(splitTime[1]);
+        }
+
+        if (flag) {
+          splitTimeHr = splitTimeHr + 1;
+          let min = splitTimeMin < 10 ? "0" + splitTimeMin : splitTimeMin;
+          let nst = tst + "-" + splitTimeHr + ":" + min;
+          tst = splitTimeHr + ":" + min;
+          cls.push(nst);
+        }
+
+        if (i == 0) {
+          tempLs.push(slotsArr[j][2]);
+        } else if(i==1 && j==0)
+        {
+          tempLs.push(slotsArr[j][4]);
+        }else{
+          tempLs.push(null);
+        }
+      }
+
+      ls.push(tempLs);
+
+      if (j == 0) {
+        flag = false;
+      }
     }
 
     setTimecol(cls);
-    setAllcol([]);
-    for (let i = 0; i < rows; i++) {
-      setAllcol((prev) => [...prev, ls]);
-    }
+    setAllcol(ls);
+
     setSbutt(true);
     setLead(1);
   }
@@ -627,7 +625,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                      // disabled="disabled"
+                    // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
@@ -664,7 +662,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                      // disabled="disabled"
+                    // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
@@ -701,7 +699,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                      // disabled="disabled"
+                    // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
