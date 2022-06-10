@@ -4,9 +4,8 @@ import "jspdf-autotable";
 import Table from "../navigation/table";
 
 function Home() {
+  const [ccallcol, setCcallcol] = useState([]);
   const [rows, setRows] = useState(null);
-  const [hinfo, setHinfo] = useState(null);
-  const [sbutt, setSbutt] = useState(false);
   const [timecol, setTimecol] = useState(null);
   const [sttime, setSttime] = useState("8:00");
   const [lsttime, setLsttime] = useState(null);
@@ -121,14 +120,21 @@ function Home() {
 
   useEffect(() => {
     setPossibleStartTimes();
+    // eslint-disable-next-line
   }, [lecturesBeforeLunch]);
 
   useEffect(() => {
     setPossibleStartTimes();
+    // eslint-disable-next-line
+
     setPossibleLunchEndTimes();
+    // eslint-disable-next-line
   }, [lunchStartTime]);
 
-  let [info, setInfo] = useState(null);
+  useEffect(() => {
+    crtTable();
+    // eslint-disable-next-line
+  }, [lead]);
 
   console.log(allcol);
 
@@ -219,17 +225,7 @@ function Home() {
 
   console.log(sttime, lsttime);
 
-  // const [rem, setRem] = useState(0);
-
-  useEffect(() => {
-    crtTable();
-  }, [lead]);
-
-  // console.log("Rem", rem);
-
   function handleclick() {
-    setInfo(null);
-
     let ls = [];
     let cls = [];
     let rem = 0;
@@ -332,6 +328,7 @@ function Home() {
 
     setTimecol(cls);
     setAllcol([]);
+    setCcallcol([]);
 
     if (lecturesBeforeLunch === "4") {
       const slots4bfl = [
@@ -353,6 +350,7 @@ function Home() {
           j++;
         }
         // console.log("After", nls);
+        setCcallcol((prev) => [...prev, nls]);
         setAllcol((prev) => [...prev, nls]);
       }
     } else {
@@ -375,30 +373,19 @@ function Home() {
           j++;
         }
         // console.log("After", nls);
+        setCcallcol((prev) => [...prev, nls]);
         setAllcol((prev) => [...prev, nls]);
       }
     }
 
-    setSbutt(true);
-    setLead(1);
+    setLead((prev) => prev + 1);
   }
 
+  console.log(ccallcol);
   console.log(allcol);
-  let remmm = 1;
 
-  // console.log("idx", courseInputs[0].l);
-  // console.log(typeof lecturesBeforeLunch);
-  //  function courseInfo(courseCode, totalLectures, l, lPr, t, tPr, p, pPr) {
-  //    this.courseCode = courseCode;
-  //    this.totalLectures = totalLectures;
-  //    this.l = l;
-  //    this.lPr = lPr;
-  //    this.t = t;
-  //    this.tPr = tPr;
-  //    this.p = p;
-  //    this.pPr = pPr;
-  //  }
   const updateTT = () => {
+    handleclick();
     let distribution = { L: {}, T: {}, P: {} };
     let lectslot = { L: new Set(), T: new Set(), P: new Set() };
     for (let i = 0; i < courseInputs.length; i++) {
@@ -440,6 +427,7 @@ function Home() {
     uniquearray = uniquearray.reverse();
     console.log("unique", uniquearray);
     let dict = {};
+    let remmm = 1;
     for (let i = 0; i < uniquearray.length; i++) {
       for (let j = 0; j < distribution.L[uniquearray[i]].length; j++) {
         dict[remmm] = [distribution.L[uniquearray[i]][j], uniquearray[i]];
@@ -449,7 +437,9 @@ function Home() {
 
     console.log("Dict", dict);
 
-    let copyallcol = [...allcol];
+    let copyallcol = [...ccallcol];
+
+    console.log("old", copyallcol);
 
     for (let i = 0; i < copyallcol[0].length; i++) {
       for (let j = 0; j < copyallcol.length; j++) {
@@ -464,7 +454,7 @@ function Home() {
       }
     }
 
-    console.log(allcol);
+    console.log("new", copyallcol);
 
     setAllcol(copyallcol);
     setLead((prev) => prev + 1);
@@ -480,14 +470,8 @@ function Home() {
             name="rows"
             id="rows"
             onChange={(event) => {
-              if (event.target.value > 6 || event.target.value < 0) {
-                setHinfo("Enter value from 1 to 6");
-              } else {
-                setHinfo(null);
+              if (event.target.value < 7 && event.target.value > 0) {
                 setRows(event.target.value);
-                setSbutt(false);
-                setAllcol([]);
-                setTbl(null);
               }
             }}
             value={rows}
@@ -780,7 +764,7 @@ function Home() {
           </div>
         </div>
         <div className="flex flex-col w-3/5 mx-auto">{tbl}</div>
-        <div className={sbutt ? "w-1/3 mx-auto align-center my-3" : "hidden"}>
+        <div className={"w-1/3 mx-auto align-center my-3"}>
           <button
             onClick={exportPDF}
             className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
