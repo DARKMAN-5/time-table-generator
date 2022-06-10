@@ -4,7 +4,7 @@ import "jspdf-autotable";
 import Table from "../navigation/table";
 
 function Home() {
-  const [ccallcol, setCcallcol] = useState([]);
+  let ccallcol = [];
   const [rows, setRows] = useState(null);
   const [timecol, setTimecol] = useState(null);
   const [sttime, setSttime] = useState("8:00");
@@ -328,7 +328,6 @@ function Home() {
 
     setTimecol(cls);
     setAllcol([]);
-    setCcallcol([]);
 
     if (lecturesBeforeLunch === "4") {
       const slots4bfl = [
@@ -350,7 +349,7 @@ function Home() {
           j++;
         }
         // console.log("After", nls);
-        setCcallcol((prev) => [...prev, nls]);
+        ccallcol.push(nls);
         setAllcol((prev) => [...prev, nls]);
       }
     } else {
@@ -373,7 +372,7 @@ function Home() {
           j++;
         }
         // console.log("After", nls);
-        setCcallcol((prev) => [...prev, nls]);
+        ccallcol.push(nls);
         setAllcol((prev) => [...prev, nls]);
       }
     }
