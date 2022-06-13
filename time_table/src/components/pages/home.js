@@ -11,6 +11,7 @@ function Home() {
   const [lsttime, setLsttime] = useState(null);
   const [lead, setLead] = useState(0);
   const [oallp, setOallp] = useState(null);
+  const [sectn, setSectn] = useState(1);
 
   function courseInfo(courseCode, totalLectures, l, lPr, t, tPr, p, pPr) {
     this.courseCode = courseCode;
@@ -203,11 +204,26 @@ function Home() {
     }
 
     allcol.map((col, index) => {
-      let ml = {
-        col1: days[index],
-      };
+      if (sectn === 1) {
+        let ml = {
+          col1: days[index],
+        };
 
-      data.push(ml);
+        data.push(ml);
+      } else if (sectn === 2 && index % 2 === 0) {
+        let ml = {
+          col1: days[index / 2],
+        };
+
+        data.push(ml);
+      } else {
+        let ml = {
+          col1: null,
+        };
+
+        data.push(ml);
+      }
+
       for (let i = 0; i < allcol[index].length; i++) {
         let st = "col" + i + 2;
         data[index][st] = allcol[index][i];
@@ -349,8 +365,10 @@ function Home() {
           j++;
         }
         // console.log("After", nls);
-        ccallcol.push(nls);
-        setAllcol((prev) => [...prev, nls]);
+        for (let j = 0; j < sectn; j++) {
+          ccallcol.push([...nls]);
+          setAllcol((prev) => [...prev, ls]);
+        }
       }
     } else {
       const slots4bfl = [
@@ -372,8 +390,10 @@ function Home() {
           j++;
         }
         // console.log("After", nls);
-        ccallcol.push(nls);
-        setAllcol((prev) => [...prev, nls]);
+        for (let j = 0; j < sectn; j++) {
+          ccallcol.push([...nls]);
+          setAllcol((prev) => [...prev, ls]);
+        }
       }
     }
 
@@ -386,6 +406,9 @@ function Home() {
   const updateTT = () => {
     handleclick();
     let distribution = { L: {}, T: {}, P: {} };
+    let totL = 0,
+      totT = 0,
+      totP = 0;
     let lectslot = { L: new Set(), T: new Set(), P: new Set() };
     for (let i = 0; i < courseInputs.length; i++) {
       if (courseInputs[i].courseCode !== "") {
@@ -396,6 +419,7 @@ function Home() {
           } else {
             distribution.L[courseInputs[i].l] = [courseInputs[i].courseCode];
           }
+          totL++;
         }
 
         if (courseInputs[i].t !== 0) {
@@ -406,15 +430,17 @@ function Home() {
           } else {
             distribution.T[courseInputs[i].t] = [courseInputs[i].courseCode];
           }
+          totT++;
         }
 
         if (courseInputs[i].p !== 0) {
           lectslot.P.add(courseInputs[i].p);
           if (distribution.P[courseInputs[i].p] !== undefined) {
-            distribution.P[courseInputs[i].t].push(courseInputs[i].courseCode);
+            distribution.P[courseInputs[i].p].push(courseInputs[i].courseCode);
           } else {
-            distribution.P[courseInputs[i].t] = [courseInputs[i].courseCode];
+            distribution.P[courseInputs[i].p] = [courseInputs[i].courseCode];
           }
+          totP++;
         }
       }
     }
@@ -434,21 +460,141 @@ function Home() {
       }
     }
 
+    uniquearray = Array.from(lectslot.T);
+    uniquearray.sort((a, b) => a - b);
+    uniquearray = uniquearray.reverse();
+    let arrT = [];
+    for (let i = 0; i < uniquearray.length; i++) {
+      for (let j = 0; j < distribution.P[uniquearray[i]].length; j++) {
+        arrT.push([distribution.T[uniquearray[i]][j], uniquearray[i]]);
+      }
+    }
+
     console.log("Dict", dict);
 
     let copyallcol = [...ccallcol];
 
     console.log("old", copyallcol);
-
+    let Lunch_idx = null;
     for (let i = 0; i < copyallcol[0].length; i++) {
       for (let j = 0; j < copyallcol.length; j++) {
-        if (copyallcol[j][i] !== null && dict[copyallcol[j][i]] !== undefined) {
+        if (
+          sectn === 1 &&
+          copyallcol[j][i] !== null &&
+          dict[copyallcol[j][i]] !== undefined
+        ) {
           if (dict[copyallcol[j][i]][1] > 0) {
             dict[copyallcol[j][i]][1]--;
             copyallcol[j][i] = dict[copyallcol[j][i]][0];
           } else {
             copyallcol[j][i] = null;
           }
+        } else if (
+          sectn === 2 &&
+          j % 2 === 0 &&
+          copyallcol[j][i] !== null &&
+          dict[copyallcol[j][i]] !== undefined
+        ) {
+          if (dict[copyallcol[j][i]][1] > 0) {
+            dict[copyallcol[j][i]][1]--;
+            copyallcol[j][i] = dict[copyallcol[j][i]][0];
+          } else {
+            copyallcol[j][i] = null;
+          }
+        } else if (
+          copyallcol[j][i] !== "Lunch" &&
+          copyallcol[j][i] !== "Break"
+        ) {
+          copyallcol[j][i] = null;
+        }
+      }
+
+      if (copyallcol[0][i] === "Lunch") {
+        Lunch_idx = i;
+      }
+    }
+
+    let arrP = Object.keys(distribution.P).reverse();
+    // console.log("LI", Lunch_idx);
+
+    for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
+      for (
+        let j = 0;
+        j < copyallcol.length && j < (sectn === 1 ? totP : 2 * totP);
+        j++
+      ) {
+        if (sectn === 1 && copyallcol[j][i] === null) {
+          let i1 = i;
+          let val = copyallcol[0].length - i;
+          // console.log("VAL", val);
+          if (
+            distribution.P.hasOwnProperty(val) &&
+            distribution.P[val].length > 0
+          ) {
+            let sub = distribution.P[val][0];
+            distribution.P[val].shift();
+            while (i1 < copyallcol[0].length && val--) {
+              copyallcol[j][i1] = sub + "[L]";
+              i1++;
+            }
+          } else {
+            let k = 0;
+            while (
+              k < arrP.length &&
+              (parseInt(arrP[k]) > val ||
+                distribution.P[parseInt(arrP[k])].length === 0)
+            ) {
+              k++;
+            }
+            if (k === arrP.length) {
+              break;
+            }
+            val = parseInt(arrP[k]);
+            let sub = distribution.P[val][0];
+            distribution.P[val].shift();
+            while (i1 < copyallcol[0].length && val--) {
+              copyallcol[j][i1] = sub + "[L]";
+              i1++;
+            }
+          }
+          console.log("inside", copyallcol);
+        } else if (sectn === 2 && j % 2 === 0 && copyallcol[j][i] === null) {
+          let i1 = i;
+          let val = copyallcol[0].length - i;
+          // console.log("VAL", val);
+          if (
+            distribution.P.hasOwnProperty(val) &&
+            distribution.P[val].length > 0
+          ) {
+            let sub = distribution.P[val][0];
+            distribution.P[val].shift();
+            while (i1 < copyallcol[0].length && val--) {
+              copyallcol[j][i1] = "A:" + sub + "[L]";
+              copyallcol[(j + 3) % (2 * totP)][i1] = "B:" + sub + "[L]";
+              i1++;
+            }
+          } else {
+            let k = 0;
+            while (
+              k < arrP.length &&
+              (parseInt(arrP[k]) > val ||
+                distribution.P[parseInt(arrP[k])].length === 0)
+            ) {
+              k++;
+            }
+            if (k === arrP.length) {
+              break;
+            }
+            val = parseInt(arrP[k]);
+            let sub = distribution.P[val][0];
+            distribution.P[val].shift();
+            while (i1 < copyallcol[0].length && val--) {
+              copyallcol[j][i1] = "A:" + sub + "[L]";
+              copyallcol[(j + 3) % (2 * totP)][i1] = "B:" + sub + "[L]";
+              i1++;
+            }
+          }
+          console.log("inside", copyallcol);
         }
       }
     }
@@ -571,6 +717,18 @@ function Home() {
             </option>
             <option value="mor">Morning</option>
             <option value="aft">Afternoon</option>
+          </select>
+
+          <div className="pt-5 text-xl font-semibold">Total Section</div>
+          <select
+            value={sectn}
+            onChange={(e) => setSectn(parseInt(e.target.value))}
+            style={{ color: "black" }}
+            id="section"
+            name="section"
+          >
+            <option value="1">1</option>
+            <option value="2">2</option>
           </select>
         </div>
 
