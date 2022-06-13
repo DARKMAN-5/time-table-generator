@@ -137,7 +137,7 @@ function Home() {
     // eslint-disable-next-line
   }, [lead]);
 
-  console.log(allcol);
+  // console.log(allcol);
 
   let exportPDF = () => {
     const unit = "pt";
@@ -157,7 +157,7 @@ function Home() {
     let ori = 50;
     headers = [...timecol];
     headers.unshift("Day");
-    console.log("headers: ", headers);
+    // console.log("headers: ", headers);
     allcol.map((col, index) => {
       data.push([]);
       data[index] = allcol[index].map((elt) => elt);
@@ -165,7 +165,7 @@ function Home() {
       return 0;
     });
 
-    console.log("DATA: ", data);
+    // console.log("DATA: ", data);
     let content = {
       theme: "grid",
       startY: ori,
@@ -176,7 +176,7 @@ function Home() {
     doc.save("Time-Table.pdf");
   };
 
-  console.log("timecol ", timecol);
+  // console.log("timecol ", timecol);
 
   const [tbl, setTbl] = useState(null);
 
@@ -232,14 +232,14 @@ function Home() {
       return null;
     });
 
-    console.log("data: ", data);
-    console.log("columns", columns);
+    // console.log("data: ", data);
+    // console.log("columns", columns);
 
     let ntbl = <Table data={data} columns={columns} />;
     setTbl(ntbl);
   }
 
-  console.log(sttime, lsttime);
+  // console.log(sttime, lsttime);
 
   function handleclick() {
     let ls = [];
@@ -400,8 +400,8 @@ function Home() {
     setLead((prev) => prev + 1);
   }
 
-  console.log(ccallcol);
-  console.log(allcol);
+  // console.log(ccallcol);
+  // console.log(allcol);
 
   const updateTT = () => {
     handleclick();
@@ -445,12 +445,12 @@ function Home() {
       }
     }
 
-    console.log("dist", distribution);
-
+    // Lecture Assignment Code
     let uniquearray = Array.from(lectslot.L);
     uniquearray.sort((a, b) => a - b);
     uniquearray = uniquearray.reverse();
-    console.log("unique", uniquearray);
+    // console.log("dist", distribution);
+    // console.log("unique", uniquearray);
     let dict = {};
     let remmm = 1;
     for (let i = 0; i < uniquearray.length; i++) {
@@ -460,21 +460,11 @@ function Home() {
       }
     }
 
-    uniquearray = Array.from(lectslot.T);
-    uniquearray.sort((a, b) => a - b);
-    uniquearray = uniquearray.reverse();
-    let arrT = [];
-    for (let i = 0; i < uniquearray.length; i++) {
-      for (let j = 0; j < distribution.P[uniquearray[i]].length; j++) {
-        arrT.push([distribution.T[uniquearray[i]][j], uniquearray[i]]);
-      }
-    }
-
-    console.log("Dict", dict);
+    // console.log("Dict", dict);
 
     let copyallcol = [...ccallcol];
 
-    console.log("old", copyallcol);
+    // console.log("old", copyallcol);
     let Lunch_idx = null;
     for (let i = 0; i < copyallcol[0].length; i++) {
       for (let j = 0; j < copyallcol.length; j++) {
@@ -514,9 +504,8 @@ function Home() {
       }
     }
 
+    // Lab Assignment Code
     let arrP = Object.keys(distribution.P).reverse();
-    // console.log("LI", Lunch_idx);
-
     for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
       for (
         let j = 0;
@@ -557,7 +546,7 @@ function Home() {
               i1++;
             }
           }
-          console.log("inside", copyallcol);
+          // console.log("inside", copyallcol);
         } else if (sectn === 2 && j % 2 === 0 && copyallcol[j][i] === null) {
           let i1 = i;
           let val = copyallcol[0].length - i;
@@ -594,12 +583,42 @@ function Home() {
               i1++;
             }
           }
-          console.log("inside", copyallcol);
+          // console.log("inside", copyallcol);
         }
       }
     }
 
-    console.log("new", copyallcol);
+    // Tutorial Assignment Code
+    let flag = true;
+    let prevT;
+    for (let i = 0; i < copyallcol[0].length; i++) {
+      for (let j = 0; j < copyallcol.length; j++) {
+        if (
+          sectn === 1 &&
+          distribution.T[1].length > 0 &&
+          copyallcol[j][i] === null
+        ) {
+          copyallcol[j][i] = distribution.T[1][0] + "[T]";
+          distribution.T[1].shift();
+        } else if (
+          sectn === 2 &&
+          distribution.T[1].length > 0 &&
+          j % 2 === 0 &&
+          copyallcol[j][i] === null
+        ) {
+          copyallcol[j][i] = "A:" + distribution.T[1][0] + "[T]";
+          copyallcol[j + 1][i] = flag
+            ? "B:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
+            : prevT;
+          prevT = "B:" + distribution.T[1][0] + "[T]";
+          flag = false;
+          distribution.T[1].shift();
+        }
+        // console.log("TIN", copyallcol);
+      }
+    }
+
+    // console.log("new", copyallcol);
 
     setAllcol(copyallcol);
     setLead((prev) => prev + 1);
@@ -607,7 +626,7 @@ function Home() {
 
   return (
     <div className="mx-auto my-5 w-full">
-      <div className={lead === 0 ? "block w-2/3 mx-auto my-16" : "hidden"}>
+      <div className={lead === 0 ? "block w-2/3 mx-auto my-8" : "hidden"}>
         <div className="bg-bck-3 text-center rounded ">
           <div className="pt-5 text-xl font-semibold">Total working days</div>
           <input
@@ -881,7 +900,7 @@ function Home() {
                       event.target.value === ""
                         ? 0
                         : parseFloat(event.target.value, 10);
-                    console.log(courseInputs);
+                    // console.log(courseInputs);
                   }}
                 >
                   <option value="Select" selected>
