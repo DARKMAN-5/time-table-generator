@@ -235,7 +235,30 @@ function Home() {
     // console.log("data: ", data);
     // console.log("columns", columns);
 
-    let ntbl = <Table data={data} columns={columns} />;
+    const obj = { 'Day': '#ED7D31' };
+
+    let ntbl = <Table data={data} columns={columns}
+      getHeaderProps={(cellInfo) => ({
+        style: {
+          padding: "10px",
+          border: "solid 1px gray",
+          background: cellInfo.Header in obj ? obj[cellInfo.Header] : "aliceblue",
+          color: cellInfo.Header in obj ? "white" : 'black'
+        }
+      })}
+
+      getCellProps={(cellInfo) => (
+        cellInfo.value === "Lunch" ? (obj[cellInfo.column.Header] = '#60BA48') :
+          (cellInfo.value === "Break" ? (obj[cellInfo.column.Header] = '#73a2d9') : (undefined)),
+        {
+          style: {
+            padding: "10px",
+            border: "solid 1px gray",
+            background: cellInfo.column.Header in obj ? obj[cellInfo.column.Header] : "papayawhip",
+            color: cellInfo.column.Header in obj ? 'white' : 'blue'
+          }
+        })} />;
+
     setTbl(ntbl);
   }
 
@@ -842,7 +865,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                      // disabled="disabled"
+                    // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
@@ -878,7 +901,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                      // disabled="disabled"
+                    // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
@@ -914,7 +937,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                      // disabled="disabled"
+                    // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
