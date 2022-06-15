@@ -505,13 +505,14 @@ function Home() {
     }
 
     // Lab Assignment Code
+    let last;
     let arrP = Object.keys(distribution.P).reverse();
-    for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
-      for (
-        let j = 0;
-        j < copyallcol.length && j < (sectn === 1 ? totP : 2 * totP);
-        j++
-      ) {
+    for (
+      let j = 0;
+      j < copyallcol.length && j < (sectn === 1 ? totP : 2 * totP);
+      j++
+    ) {
+      for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
         if (sectn === 1 && copyallcol[j][i] === null) {
           let i1 = i;
           let val = copyallcol[0].length - i;
@@ -580,6 +581,7 @@ function Home() {
             while (i1 < copyallcol[0].length && val--) {
               copyallcol[j][i1] = "A:" + sub + "[L]";
               copyallcol[(j + 3) % (2 * totP)][i1] = "B:" + sub + "[L]";
+              last = (j + 3) % (2 * totP);
               i1++;
             }
           }
@@ -588,11 +590,27 @@ function Home() {
       }
     }
 
+    if (sectn === 2) {
+      let cc = 0;
+      for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
+        if (copyallcol[1][i] === null) {
+          cc++;
+        }
+      }
+
+      if (cc === copyallcol[0].length - Lunch_idx - 1) {
+        for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
+          copyallcol[1][i] = copyallcol[last][i];
+          copyallcol[last][i] = null;
+        }
+      }
+    }
+
     // Tutorial Assignment Code
     let flag = true;
     let prevT;
-    for (let i = 0; i < copyallcol[0].length; i++) {
-      for (let j = 0; j < copyallcol.length; j++) {
+    for (let j = 0; j < copyallcol.length; j++) {
+      for (let i = 0; i < copyallcol[0].length; i++) {
         if (
           sectn === 1 &&
           distribution.T[1].length > 0 &&
@@ -606,13 +624,25 @@ function Home() {
           j % 2 === 0 &&
           copyallcol[j][i] === null
         ) {
-          copyallcol[j][i] = "A:" + distribution.T[1][0] + "[T]";
-          copyallcol[j + 1][i] = flag
-            ? "B:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
-            : prevT;
-          prevT = "B:" + distribution.T[1][0] + "[T]";
-          flag = false;
-          distribution.T[1].shift();
+          if (i > Lunch_idx) {
+            if (copyallcol[j + 1][i] === null) {
+              copyallcol[j][i] = "A:" + distribution.T[1][0] + "[T]";
+              copyallcol[j + 1][i] = flag
+                ? "B:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
+                : prevT;
+              prevT = "B:" + distribution.T[1][0] + "[T]";
+              flag = false;
+              distribution.T[1].shift();
+            }
+          } else {
+            copyallcol[j][i] = "A:" + distribution.T[1][0] + "[T]";
+            copyallcol[j + 1][i] = flag
+              ? "B:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
+              : prevT;
+            prevT = "B:" + distribution.T[1][0] + "[T]";
+            flag = false;
+            distribution.T[1].shift();
+          }
         }
         // console.log("TIN", copyallcol);
       }
