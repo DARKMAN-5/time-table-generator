@@ -1,7 +1,13 @@
 import React, { useMemo } from "react";
 import { useTable } from "react-table";
 
-const Table = ({ columns, data, noDataComponent, ...rest }) => {
+// Create a default prop getter
+const defaultPropGetter = () => ({});
+
+const Table = ({ columns, data, noDataComponent, getHeaderProps = defaultPropGetter,
+  getColumnProps = defaultPropGetter,
+  getRowProps = defaultPropGetter,
+  getCellProps = defaultPropGetter, ...rest }) => {
   const tableColumns = useMemo(() => columns, [columns]);
   const { getTableBodyProps, getTableProps, headerGroups, prepareRow, rows } =
     useTable({ columns: tableColumns, data });
@@ -18,13 +24,14 @@ const Table = ({ columns, data, noDataComponent, ...rest }) => {
           <tr {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
               <th
-                {...column.getHeaderProps()}
-                style={{
-                  border: "solid 1px grey",
-                  background: "aliceblue",
-                  color: "black",
-                  fontWeight: "bold",
-                }}
+                {...column.getHeaderProps([
+                  {
+                    className: column.className,
+                    style: column.style
+                  },
+                  getColumnProps(column),
+                  getHeaderProps(column)
+                ])}
               >
                 {column.render("Header")}
               </th>
@@ -40,13 +47,14 @@ const Table = ({ columns, data, noDataComponent, ...rest }) => {
               {row.cells.map((cell) => {
                 return (
                   <td
-                    {...cell.getCellProps()}
-                    style={{
-                      padding: "10px",
-                      border: "solid 1px gray",
-                      background: "papayawhip",
-                      color: "blue",
-                    }}
+                    {...cell.getCellProps([
+                      {
+                        className: cell.column.className,
+                        style: cell.column.style
+                      },
+                      getColumnProps(cell.column),
+                      getCellProps(cell)
+                    ])}
                   >
                     {cell.render("Cell")}
                   </td>
