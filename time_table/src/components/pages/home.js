@@ -235,29 +235,41 @@ function Home() {
     // console.log("data: ", data);
     // console.log("columns", columns);
 
-    const obj = { 'Day': '#ED7D31' };
+    const obj = { Day: "#ED7D31" };
 
-    let ntbl = <Table data={data} columns={columns}
-      getHeaderProps={(cellInfo) => ({
-        style: {
-          padding: "10px",
-          border: "solid 1px gray",
-          background: cellInfo.Header in obj ? obj[cellInfo.Header] : "aliceblue",
-          color: cellInfo.Header in obj ? "white" : 'black'
-        }
-      })}
-
-      getCellProps={(cellInfo) => (
-        cellInfo.value === "Lunch" ? (obj[cellInfo.column.Header] = '#60BA48') :
-          (cellInfo.value === "Break" ? (obj[cellInfo.column.Header] = '#73a2d9') : (undefined)),
-        {
+    let ntbl = (
+      <Table
+        data={data}
+        columns={columns}
+        getHeaderProps={(cellInfo) => ({
           style: {
-            padding: "10px",
+            padding: "5px",
             border: "solid 1px gray",
-            background: cellInfo.column.Header in obj ? obj[cellInfo.column.Header] : "papayawhip",
-            color: cellInfo.column.Header in obj ? 'white' : 'blue'
+            background:
+              cellInfo.Header in obj ? obj[cellInfo.Header] : "aliceblue",
+            color: cellInfo.Header in obj ? "white" : "black",
+          },
+        })}
+        getCellProps={(cellInfo) => (
+          cellInfo.value === "Lunch"
+            ? (obj[cellInfo.column.Header] = "#60BA48")
+            : cellInfo.value === "Break"
+            ? (obj[cellInfo.column.Header] = "#73a2d9")
+            : undefined,
+          {
+            style: {
+              padding: "7px",
+              border: "solid 1px gray",
+              background:
+                cellInfo.column.Header in obj
+                  ? obj[cellInfo.column.Header]
+                  : "papayawhip",
+              color: cellInfo.column.Header in obj ? "white" : "blue",
+            },
           }
-        })} />;
+        )}
+      />
+    );
 
     setTbl(ntbl);
   }
@@ -530,12 +542,12 @@ function Home() {
     // Lab Assignment Code
     let last;
     let arrP = Object.keys(distribution.P).reverse();
-    for (
-      let j = 0;
-      j < copyallcol.length && j < (sectn === 1 ? totP : 2 * totP);
-      j++
-    ) {
-      for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
+    for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
+      for (
+        let j = 0;
+        j < copyallcol.length && j < (sectn === 1 ? totP : 2 * totP);
+        j++
+      ) {
         if (sectn === 1 && copyallcol[j][i] === null) {
           let i1 = i;
           let val = copyallcol[0].length - i;
@@ -613,7 +625,7 @@ function Home() {
       }
     }
 
-    if (sectn === 2) {
+    if (sectn === 2 && arrP.length !== 0) {
       let cc = 0;
       for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
         if (copyallcol[1][i] === null) {
@@ -632,8 +644,8 @@ function Home() {
     // Tutorial Assignment Code
     let flag = true;
     let prevT;
-    for (let j = 0; j < copyallcol.length; j++) {
-      for (let i = 0; i < copyallcol[0].length; i++) {
+    for (let i = 0; i < copyallcol[0].length; i++) {
+      for (let j = 0; j < copyallcol.length; j++) {
         if (
           sectn === 1 &&
           distribution.T[1].length > 0 &&
@@ -865,7 +877,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                    // disabled="disabled"
+                      // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
@@ -901,7 +913,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                    // disabled="disabled"
+                      // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
@@ -937,7 +949,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                    // disabled="disabled"
+                      // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
@@ -992,7 +1004,7 @@ function Home() {
             </button>
           </div>
         </div>
-        <div className="flex flex-col w-3/5 mx-auto">{tbl}</div>
+        <div className="flex flex-col w-4/5 mx-auto">{tbl}</div>
         <div className={"w-1/3 mx-auto align-center my-3"}>
           <button
             onClick={exportPDF}
