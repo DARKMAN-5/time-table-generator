@@ -440,10 +440,8 @@ function Home() {
 
   const updateTT = () => {
     handleclick();
-    let distribution = { L: {}, T: {}, P: {} };
-    let totL = 0,
-      totT = 0,
-      totP = 0;
+    let distribution = { L: {}, T: {}, P: {}, TP: {} };
+
     let lectslot = { L: new Set(), T: new Set(), P: new Set() };
     for (let i = 0; i < courseInputs.length; i++) {
       if (courseInputs[i].courseCode !== "") {
@@ -454,10 +452,19 @@ function Home() {
           } else {
             distribution.L[courseInputs[i].l] = [courseInputs[i].courseCode];
           }
-          totL++;
         }
 
-        if (courseInputs[i].t !== 0) {
+        if (courseInputs[i].t !== 0 && courseInputs[i].p !== 0) {
+          if (distribution.TP[courseInputs[i].p + 1] !== undefined) {
+            distribution.TP[courseInputs[i].p + 1].push(
+              courseInputs[i].courseCode
+            );
+          } else {
+            distribution.TP[courseInputs[i].p + 1] = [
+              courseInputs[i].courseCode,
+            ];
+          }
+        } else if (courseInputs[i].t !== 0) {
           lectslot.T.add(courseInputs[i].t);
 
           if (distribution.T[courseInputs[i].t] !== undefined) {
@@ -465,17 +472,13 @@ function Home() {
           } else {
             distribution.T[courseInputs[i].t] = [courseInputs[i].courseCode];
           }
-          totT++;
-        }
-
-        if (courseInputs[i].p !== 0) {
+        } else if (courseInputs[i].p !== 0) {
           lectslot.P.add(courseInputs[i].p);
           if (distribution.P[courseInputs[i].p] !== undefined) {
             distribution.P[courseInputs[i].p].push(courseInputs[i].courseCode);
           } else {
             distribution.P[courseInputs[i].p] = [courseInputs[i].courseCode];
           }
-          totP++;
         }
       }
     }
@@ -539,15 +542,148 @@ function Home() {
       }
     }
 
-    // Lab Assignment Code
-    let last;
-    let arrP = Object.keys(distribution.P).reverse();
+    // Lab+Tutorial Assignment Code
+    let last = 0;
+    let arrP = Object.keys(distribution.TP).reverse();
     for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
-      for (
-        let j = 0;
-        j < copyallcol.length && j < (sectn === 1 ? totP : 2 * totP);
-        j++
-      ) {
+      for (let j = 0; j < copyallcol.length; j++) {
+        if (sectn === 1 && copyallcol[j][i] === null) {
+          let i1 = i;
+          let val = copyallcol[0].length - i;
+          // console.log("VAL", val);
+          if (
+            distribution.TP.hasOwnProperty(val) &&
+            distribution.TP[val].length > 0
+          ) {
+            let sub = distribution.TP[val][0];
+            distribution.TP[val].shift();
+            copyallcol[j][i1] = sub + "[T]";
+            i1++;
+            while (i1 < copyallcol[0].length && val--) {
+              copyallcol[j][i1] = sub + "[L]";
+              i1++;
+            }
+          } else {
+            let k = 0;
+            while (
+              k < arrP.length &&
+              (parseInt(arrP[k]) > val ||
+                distribution.TP[parseInt(arrP[k])].length === 0)
+            ) {
+              k++;
+            }
+            if (k === arrP.length) {
+              break;
+            }
+            val = parseInt(arrP[k]);
+            let sub = distribution.TP[val][0];
+            distribution.TP[val].shift();
+            copyallcol[j][i1] = sub + "[T]";
+            i1++;
+            while (i1 < copyallcol[0].length && val--) {
+              copyallcol[j][i1] = sub + "[L]";
+              i1++;
+            }
+          }
+          // console.log("inside", copyallcol);
+        } else if (sectn === 2 && j % 2 === 0 && copyallcol[j][i] === null) {
+          let i1 = i;
+          let val = copyallcol[0].length - i;
+          // console.log("VAL", val);
+          if (
+            distribution.TP.hasOwnProperty(val) &&
+            distribution.TP[val].length > 0
+          ) {
+            let sub = distribution.TP[val][0];
+            distribution.TP[val].shift();
+            copyallcol[j][i1] = "A:" + sub + "[T]";
+            copyallcol[(j + 3) % 10][i1] = "B:" + sub + "[T]";
+            i1++;
+            while (i1 < copyallcol[0].length && val-- > 1) {
+              copyallcol[j][i1] = "A:" + sub + "[L]";
+              copyallcol[(j + 3) % 10][i1] = "B:" + sub + "[L]";
+              i1++;
+            }
+            last = (j + 3) % 10;
+          } else {
+            let k = 0;
+            while (
+              k < arrP.length &&
+              (parseInt(arrP[k]) > val ||
+                distribution.TP[parseInt(arrP[k])].length === 0)
+            ) {
+              k++;
+            }
+            if (k === arrP.length) {
+              break;
+            }
+            val = parseInt(arrP[k]);
+            let sub = distribution.TP[val][0];
+            distribution.TP[val].shift();
+            copyallcol[j][i1] = "A:" + sub + "[T]";
+            copyallcol[(j + 3) % 10][i1] = "B:" + sub + "[T]";
+            i1++;
+            while (i1 < copyallcol[0].length && val-- > 1) {
+              copyallcol[j][i1] = "A:" + sub + "[L]";
+              copyallcol[(j + 3) % 10][i1] = "B:" + sub + "[L]";
+              last = (j + 3) % 10;
+              i1++;
+            }
+          }
+          // console.log("inside", copyallcol);
+        }
+      }
+    }
+
+    // Tutorial Assignment Code
+    // console.log("dist2", distribution);
+    let flag = true;
+    let prevT;
+    for (let i = 0; i < copyallcol[0].length; i++) {
+      for (let j = 0; j < copyallcol.length; j++) {
+        if (
+          sectn === 1 &&
+          distribution.T.hasOwnProperty(1) &&
+          distribution.T[1].length > 0 &&
+          copyallcol[j][i] === null
+        ) {
+          copyallcol[j][i] = distribution.T[1][0] + "[T]";
+          distribution.T[1].shift();
+        } else if (
+          sectn === 2 &&
+          distribution.T.hasOwnProperty(1) &&
+          distribution.T[1].length > 0 &&
+          j % 2 === 0 &&
+          copyallcol[j][i] === null
+        ) {
+          if (i > Lunch_idx) {
+            if (copyallcol[j + 1][i] === null) {
+              copyallcol[j][i] = "A:" + distribution.T[1][0] + "[T]";
+              copyallcol[j + 1][i] = flag
+                ? "B:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
+                : prevT;
+              prevT = "B:" + distribution.T[1][0] + "[T]";
+              flag = false;
+              distribution.T[1].shift();
+            }
+          } else {
+            copyallcol[j][i] = "A:" + distribution.T[1][0] + "[T]";
+            copyallcol[j + 1][i] = flag
+              ? "B:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
+              : prevT;
+            prevT = "B:" + distribution.T[1][0] + "[T]";
+            flag = false;
+            distribution.T[1].shift();
+          }
+        }
+        // console.log("TIN", copyallcol);
+      }
+    }
+
+    // Individual Lab Assignment Code
+    arrP = Object.keys(distribution.P).reverse();
+    for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
+      for (let j = 0; j < copyallcol.length; j++) {
         if (sectn === 1 && copyallcol[j][i] === null) {
           let i1 = i;
           let val = copyallcol[0].length - i;
@@ -595,8 +731,11 @@ function Home() {
             distribution.P[val].shift();
             while (i1 < copyallcol[0].length && val--) {
               copyallcol[j][i1] = "A:" + sub + "[L]";
-              copyallcol[(j + 3) % (2 * totP)][i1] = "B:" + sub + "[L]";
+              copyallcol[(j + 3) % 10][i1] = "B:" + sub + "[L]";
               i1++;
+            }
+            if ((j + 3) % 10 > last) {
+              last = (j + 3) % 10;
             }
           } else {
             let k = 0;
@@ -615,9 +754,11 @@ function Home() {
             distribution.P[val].shift();
             while (i1 < copyallcol[0].length && val--) {
               copyallcol[j][i1] = "A:" + sub + "[L]";
-              copyallcol[(j + 3) % (2 * totP)][i1] = "B:" + sub + "[L]";
-              last = (j + 3) % (2 * totP);
+              copyallcol[(j + 3) % 10][i1] = "B:" + sub + "[L]";
               i1++;
+            }
+            if ((j + 3) % 10 > last) {
+              last = (j + 3) % 10;
             }
           }
           // console.log("inside", copyallcol);
@@ -625,13 +766,17 @@ function Home() {
       }
     }
 
-    if (sectn === 2 && arrP.length !== 0) {
+    // console.log("LAST", last);
+
+    if (sectn === 2) {
       let cc = 0;
       for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
         if (copyallcol[1][i] === null) {
           cc++;
         }
       }
+
+      // console.log("cc", cc);
 
       if (cc === copyallcol[0].length - Lunch_idx - 1) {
         for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
@@ -641,59 +786,15 @@ function Home() {
       }
     }
 
-    // Tutorial Assignment Code
-    let flag = true;
-    let prevT;
-    for (let i = 0; i < copyallcol[0].length; i++) {
-      for (let j = 0; j < copyallcol.length; j++) {
-        if (
-          sectn === 1 &&
-          distribution.T[1].length > 0 &&
-          copyallcol[j][i] === null
-        ) {
-          copyallcol[j][i] = distribution.T[1][0] + "[T]";
-          distribution.T[1].shift();
-        } else if (
-          sectn === 2 &&
-          distribution.T[1].length > 0 &&
-          j % 2 === 0 &&
-          copyallcol[j][i] === null
-        ) {
-          if (i > Lunch_idx) {
-            if (copyallcol[j + 1][i] === null) {
-              copyallcol[j][i] = "A:" + distribution.T[1][0] + "[T]";
-              copyallcol[j + 1][i] = flag
-                ? "B:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
-                : prevT;
-              prevT = "B:" + distribution.T[1][0] + "[T]";
-              flag = false;
-              distribution.T[1].shift();
-            }
-          } else {
-            copyallcol[j][i] = "A:" + distribution.T[1][0] + "[T]";
-            copyallcol[j + 1][i] = flag
-              ? "B:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
-              : prevT;
-            prevT = "B:" + distribution.T[1][0] + "[T]";
-            flag = false;
-            distribution.T[1].shift();
-          }
-        }
-        // console.log("TIN", copyallcol);
-      }
-    }
-
-    // console.log("new", copyallcol);
-
     setAllcol(copyallcol);
     setLead((prev) => prev + 1);
   };
 
   return (
-    <div className="mx-auto my-5 w-full">
+    <div className="mx-auto w-full">
       <div className={lead === 0 ? "block w-2/3 mx-auto my-8" : "hidden"}>
-        <div className="bg-bck-3 text-center rounded ">
-          <div className="pt-5 text-xl font-semibold">Total working days</div>
+        <div className="bg-bck-4 text-center rounded ">
+          <div className="pt-5 text-xl font-semibold">TOTAL WEEKDAYS</div>
           <input
             type="number"
             name="rows"
@@ -701,6 +802,8 @@ function Home() {
             onChange={(event) => {
               if (event.target.value < 7 && event.target.value > 0) {
                 setRows(event.target.value);
+              } else {
+                setRows("");
               }
             }}
             value={rows}
@@ -711,123 +814,137 @@ function Home() {
           />
           {/* {rows} */}
           {/* <br /> */}
-        </div>
-        <div className="bg-bck-3 text-center rounded my-3 py-2">
-          <div className="pt-5 text-xl font-semibold">Lunch start time</div>
-          <select
-            value={lunchStartTime}
-            onChange={(e) => setLunchStartTime(e.target.value)}
-            style={{ color: "black" }}
-            id="lunchStartTime"
-            name="lunchStartTime"
-          >
-            <option value="12:30">12:30 PM</option>
-            <option value="12:45">12:45 PM</option>
-            <option value="1:00">1:00 PM</option>
-          </select>
+          <div className="text-center rounded my-3 py-2 flex flex-row flex-wrap justify-evenly">
+            <div className="bg-bck-3 p-5 m-5 w-64 rounded">
+              <div className="text-l font-semibold">1. LUNCH START TIME</div>
+              <select
+                value={lunchStartTime}
+                onChange={(e) => setLunchStartTime(e.target.value)}
+                style={{ color: "black" }}
+                id="lunchStartTime"
+                name="lunchStartTime"
+              >
+                <option value="12:30">12:30 PM</option>
+                <option value="12:45">12:45 PM</option>
+                <option value="1:00">1:00 PM</option>
+              </select>
+            </div>
 
-          <div className="pt-5 text-xl font-semibold">
-            Lectures before lunch
+            <div className="bg-bck-3 p-5 m-5 w-64 rounded">
+              <div className="text-l font-semibold">2. SLOTS BEFORE LUNCH</div>
+              <select
+                style={{ color: "black" }}
+                value={lecturesBeforeLunch}
+                onChange={(e) => setLecturesBeforeLunch(e.target.value)}
+                id="lecturesBeforeLunch"
+                name="lecturesBeforeLunch"
+              >
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
+            </div>
+
+            <div className="bg-bck-3 p-5 m-5 w-64 rounded">
+              <div className="text-l font-semibold">3. SLOTS START TIME</div>
+              <select
+                style={{ color: "black" }}
+                id="lectureStartTime"
+                name="lecturesStartTime"
+                onChange={(event) => {
+                  let tem = event.target.value;
+                  let st = tem.slice(0, -3);
+                  setSttime(st);
+                }}
+              >
+                {lectureStartTimes.map((time) => (
+                  <option value={time}>{time}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="bg-bck-3 p-5 m-5 w-64 rounded">
+              <div className="text-l font-semibold">4. LUNCH END TIME</div>
+              <select
+                style={{ color: "black" }}
+                id="lunchEndTime"
+                name="lunchEndTime"
+                onChange={(event) => {
+                  let tem = event.target.value;
+                  let st = tem.slice(0, -3);
+                  // let tot = 60 * parseInt(tem.slice(0, 2)) + parseInt(tem.slice(3));
+                  setLsttime(st);
+                }}
+              >
+                {lunchEndTimes.map((time) => (
+                  <option value={time}>{time}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="bg-bck-3 p-5 m-5 w-64 rounded">
+              <div className="text-l font-semibold">5. SLOTS AFTER LUNCH</div>
+              <select
+                style={{ color: "black" }}
+                value={lecturesAfterLunch}
+                onChange={(e) => {
+                  setLecturesAfterLunch(e.target.value);
+                }}
+                id="lecturesAfterLunch"
+                name="lecturesAfterLunch"
+              >
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
+            </div>
+            <div className="bg-bck-3 p-5 m-5 w-64 rounded">
+              <div className="text-l font-semibold">6. LECTURE PRIORITY</div>
+              <select
+                style={{ color: "black" }}
+                value={oallp}
+                onChange={(e) => {
+                  setOallp(e.target.value);
+                }}
+                id="oallp"
+                name="oallp"
+              >
+                <option value="Selected" selected="true" disabled="disabled">
+                  Select
+                </option>
+                <option value="mor">Morning</option>
+                <option value="aft">Afternoon</option>
+              </select>
+            </div>
+
+            <div className="bg-bck-3 p-5 m-5 w-64 rounded">
+              <div className="text-l font-semibold">7. TOTAL BATCH</div>
+              <select
+                value={sectn}
+                onChange={(e) => setSectn(parseInt(e.target.value))}
+                style={{ color: "black" }}
+                id="section"
+                name="section"
+              >
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+            </div>
           </div>
-          <select
-            style={{ color: "black" }}
-            value={lecturesBeforeLunch}
-            onChange={(e) => setLecturesBeforeLunch(e.target.value)}
-            id="lecturesBeforeLunch"
-            name="lecturesBeforeLunch"
-          >
-            <option value="3">3</option>
-            <option value="4">4</option>
-          </select>
-
-          <div className="pt-5 text-xl font-semibold">Lecture start time</div>
-          <select
-            style={{ color: "black" }}
-            id="lectureStartTime"
-            name="lecturesStartTime"
-            onChange={(event) => {
-              let tem = event.target.value;
-              let st = tem.slice(0, -3);
-              setSttime(st);
-            }}
-          >
-            {lectureStartTimes.map((time) => (
-              <option value={time}>{time}</option>
-            ))}
-          </select>
-
-          <div className="pt-5 text-xl font-semibold">Lunch end time</div>
-          <select
-            style={{ color: "black" }}
-            id="lunchEndTime"
-            name="lunchEndTime"
-            onChange={(event) => {
-              let tem = event.target.value;
-              let st = tem.slice(0, -3);
-              // let tot = 60 * parseInt(tem.slice(0, 2)) + parseInt(tem.slice(3));
-              setLsttime(st);
-            }}
-          >
-            {lunchEndTimes.map((time) => (
-              <option value={time}>{time}</option>
-            ))}
-          </select>
-
-          <div className="pt-5 text-xl font-semibold">Lectures after lunch</div>
-          <select
-            style={{ color: "black" }}
-            value={lecturesAfterLunch}
-            onChange={(e) => {
-              setLecturesAfterLunch(e.target.value);
-            }}
-            id="lecturesAfterLunch"
-            name="lecturesAfterLunch"
-          >
-            <option value="3">3</option>
-            <option value="4">4</option>
-          </select>
-          <div className="pt-5 text-xl font-semibold">Priority</div>
-          <select
-            style={{ color: "black" }}
-            value={oallp}
-            onChange={(e) => {
-              setOallp(e.target.value);
-            }}
-            id="oallp"
-            name="oallp"
-          >
-            <option value="Selected" selected="true" disabled="disabled">
-              Select
-            </option>
-            <option value="mor">Morning</option>
-            <option value="aft">Afternoon</option>
-          </select>
-
-          <div className="pt-5 text-xl font-semibold">Total Section</div>
-          <select
-            value={sectn}
-            onChange={(e) => setSectn(parseInt(e.target.value))}
-            style={{ color: "black" }}
-            id="section"
-            name="section"
-          >
-            <option value="1">1</option>
-            <option value="2">2</option>
-          </select>
-        </div>
-
-        <div className="w-1/3 mx-auto align-center my-3">
-          <button
-            onClick={rows === null ? null : handleclick}
-            className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-          >
-            Generate
-          </button>
+          <p className="text-xs font-thin text-yellow-300">
+            **FILL THE INPUT IN ORDER
+          </p>
+          <div className="w-1/3 mx-auto align-center">
+            <button
+              onClick={rows === null ? null : handleclick}
+              className="w-full my-10 text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-m px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
+            >
+              Generate
+            </button>
+          </div>
         </div>
       </div>
 
       {/* *************************************************************************************************************** */}
-      <div className={lead !== 0 ? "block" : "hidden"}>
+      <div className={lead !== 0 ? "block mx-10  py-5 rounded" : "hidden"}>
         <div className=" flex flex-row flex-wrap justify-evenly">
           {courseInputs.map((obj) => (
             <div className="flex flex-row justify-evenly bg-bck-3 text-center rounded mb-1 py-2 w-1/4 mx-1">
@@ -982,7 +1099,7 @@ function Home() {
           <div className="w-1/6 mx-auto align-center my-3">
             <button
               onClick={() => window.location.reload()}
-              className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
             >
               Back
             </button>
@@ -990,7 +1107,7 @@ function Home() {
           <div className="w-1/6 mx-auto align-center my-3">
             <button
               onClick={updateTT}
-              className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
             >
               Update
             </button>
@@ -998,7 +1115,7 @@ function Home() {
           <div className="w-1/6 mx-auto align-center my-3">
             <button
               onClick={addCourseInputs}
-              className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
             >
               Add
             </button>
@@ -1008,7 +1125,7 @@ function Home() {
         <div className={"w-1/3 mx-auto align-center my-3"}>
           <button
             onClick={exportPDF}
-            className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
           >
             Print Time Table
           </button>
