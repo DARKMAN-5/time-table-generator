@@ -1,14 +1,18 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useTable } from "react-table";
 
-const Table = ({ columns, data, noDataComponent,
+const Table = ({
+  columns,
+  data,
+  noDataComponent,
   clickEnabled,
   cellObj,
   setCellObj,
   selectedObj,
   setSelectedObj,
   handleSwap,
-  ...rest }) => {
+  ...rest
+}) => {
   const tableColumns = useMemo(() => columns, [columns]);
   const { getTableBodyProps, getTableProps, headerGroups, prepareRow, rows } =
     useTable({ columns: tableColumns, data });
@@ -21,7 +25,7 @@ const Table = ({ columns, data, noDataComponent,
     setSelectedRow(-1);
     setSelectedCol(-1);
     setSelectedVal("Not Selected");
-  }
+  };
 
   const updateArrAndCells = (idx) => {
     reinitailizeRowCol();
@@ -41,53 +45,55 @@ const Table = ({ columns, data, noDataComponent,
     const newArr = [...cellObj];
     newArr[idx]["value"] = selectedVal;
     setCellObj(newArr);
-  }
+  };
 
   const resetArr = (idx) => {
-    if (selectedObj.length == 2) {
+    if (selectedObj.length === 2) {
       const newObj = {};
       newObj[-1] = -1;
       const newArr = [...selectedObj];
       newArr[idx] = newObj;
       setSelectedObj(newArr);
     }
-  }
+  };
 
   const resetCellObj = (idx) => {
     const newArr = [...cellObj];
     newArr[idx]["select"] = false;
     newArr[idx]["set"] = false;
     setCellObj(newArr);
-  }
+  };
 
   useEffect(() => {
-    if (clickEnabled == false) {
+    if (clickEnabled === false) {
       reinitailizeRowCol();
       resetCellObj(0);
       resetCellObj(1);
       const newArr = [];
       setSelectedObj(newArr);
     }
-  }, [clickEnabled])
+    // eslint-disable-next-line
+  }, [clickEnabled]);
 
   useEffect(() => {
-    if (cellObj[0]["select"] == true) {
+    if (cellObj[0]["select"] === true) {
       resetArr(0);
-      if (cellObj[0]["set"] == true) {
+      if (cellObj[0]["set"] === true) {
         updateArrAndCells(0);
         resetCellObj(0);
       }
-    } else if (cellObj[1]["select"] == true) {
+    } else if (cellObj[1]["select"] === true) {
       resetArr(1);
-      if (cellObj[1]["set"] == true) {
+      if (cellObj[1]["set"] === true) {
         updateArrAndCells(1);
         resetCellObj(1);
       }
     }
-  }, [cellObj])
+    // eslint-disable-next-line
+  }, [cellObj]);
 
   const getCellValue = (e, j) => {
-    if (cellObj[0]["select"] == true || cellObj[1]["select"] == true) {
+    if (cellObj[0]["select"] === true || cellObj[1]["select"] === true) {
       setSelectedRow(e.row);
       setSelectedCol(j);
       setSelectedVal(e.value);
@@ -110,7 +116,7 @@ const Table = ({ columns, data, noDataComponent,
                   padding: "10px",
                   border: "solid 1px gray",
                   background: "aliceblue",
-                  color: 'black'
+                  color: "black",
                 }}
                 {...column.getHeaderProps()}
               >
@@ -126,13 +132,24 @@ const Table = ({ columns, data, noDataComponent,
           return (
             <tr {...row.getRowProps()}>
               {row.cells.map((cell, j) => {
-                const exp1 = (row.id == selectedRow.id && j == selectedCol) || (selectedObj.filter(function (e) { return e[row.id] === j; }).length > 0) ? '#FEB2C3' :
-                  'papayawhip';
-                const exp2 = cell.value === 'Break' ? '#73a2d9' : exp1;
-                const exp3 = cell.value === 'Lunch' ? '#60BA48' : exp2;
-                const finalExpBg = cell.column.Header === 'Day' ? '#ED7D31' : exp3;
+                const exp1 =
+                  (row.id === selectedRow.id && j === selectedCol) ||
+                  selectedObj.filter(function (e) {
+                    return e[row.id] === j;
+                  }).length > 0
+                    ? "#FEB2C3"
+                    : "papayawhip";
+                const exp2 = cell.value === "Break" ? "#73a2d9" : exp1;
+                const exp3 = cell.value === "Lunch" ? "#60BA48" : exp2;
+                const finalExpBg =
+                  cell.column.Header === "Day" ? "#ED7D31" : exp3;
 
-                const finalExpClr = cell.value === 'Break' || cell.value == 'Lunch' || cell.column.Header == 'Day' ? 'white' : 'black';
+                const finalExpClr =
+                  cell.value === "Break" ||
+                  cell.value === "Lunch" ||
+                  cell.column.Header === "Day"
+                    ? "white"
+                    : "black";
 
                 return (
                   <td
@@ -141,7 +158,7 @@ const Table = ({ columns, data, noDataComponent,
                       padding: "10px",
                       border: "solid 1px gray",
                       background: finalExpBg,
-                      color: finalExpClr
+                      color: finalExpClr,
                     }}
                     {...cell.getCellProps()}
                   >
