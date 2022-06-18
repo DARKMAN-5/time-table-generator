@@ -12,6 +12,17 @@ function Home() {
   const [lead, setLead] = useState(0);
   const [oallp, setOallp] = useState(null);
   const [sectn, setSectn] = useState(1);
+  const [clickEnabled, setClickEnabled] = useState(false);
+  const [selectedObj, setSelectedObj] = useState([]);
+
+  const tempArr = [];
+
+  for (let i = 0; i < 2; i++) {
+    let obj = { "select": false, "set": false, "value": "Not Selected" };
+    tempArr.push(obj);
+  }
+
+  const [cellObj, setCellObj] = useState(tempArr);
 
   function courseInfo(courseCode, totalLectures, l, lPr, t, tPr, p, pPr) {
     this.courseCode = courseCode;
@@ -137,7 +148,12 @@ function Home() {
     // eslint-disable-next-line
   }, [lead]);
 
+  const btnBgClr = !clickEnabled ? '#BFD4FB' : '';
+  const setBtnClr = !clickEnabled ? '#BFD4FB' : '#2C47DF';
+
   // console.log(allcol);
+  const [tblData, setTblData] = useState([]);
+  const [tblCols, setTblCols] = useState([]);
 
   let exportPDF = () => {
     const unit = "pt";
@@ -175,10 +191,6 @@ function Home() {
     doc.autoTable(content);
     doc.save("Time-Table.pdf");
   };
-
-  // console.log("timecol ", timecol);
-
-  const [tbl, setTbl] = useState(null);
 
   function crtTable() {
     if (allcol.length === 0) {
@@ -232,46 +244,44 @@ function Home() {
       return null;
     });
 
-    // console.log("data: ", data);
-    // console.log("columns", columns);
+    setTblData(data);
+    setTblCols(columns);
+  }
 
-    const obj = { Day: "#ED7D31" };
+  const enableClick = () => {
+    setClickEnabled(!clickEnabled);
+  }
 
-    let ntbl = (
-      <Table
-        data={data}
-        columns={columns}
-        getHeaderProps={(cellInfo) => ({
-          style: {
-            padding: "5px",
-            border: "solid 1px gray",
-            background:
-              cellInfo.Header in obj ? obj[cellInfo.Header] : "aliceblue",
-            color: cellInfo.Header in obj ? "white" : "black",
-          },
-        })}
-        getCellProps={(cellInfo) => (
-          cellInfo.value === "Lunch"
-            ? (obj[cellInfo.column.Header] = "#60BA48")
-            : cellInfo.value === "Break"
-            ? (obj[cellInfo.column.Header] = "#73a2d9")
-            : undefined,
-          {
-            style: {
-              padding: "7px",
-              border: "solid 1px gray",
-              background:
-                cellInfo.column.Header in obj
-                  ? obj[cellInfo.column.Header]
-                  : "papayawhip",
-              color: cellInfo.column.Header in obj ? "white" : "blue",
-            },
-          }
-        )}
-      />
-    );
+  const swap = (row1, col1, row2, col2) => {
+    let newAllCol = [...allcol];
+    let temp = newAllCol[row1][col1];
+    newAllCol[row1][col1] = newAllCol[row2][col2];
+    newAllCol[row2][col2] = temp;
+    setAllcol(newAllCol);
+    setLead((prev) => prev + 1);
+  }
 
-    setTbl(ntbl);
+  const handleSwap = () => {
+    const row1 = Object.keys(selectedObj[0])[0];
+    const col1 = selectedObj[0][row1];
+
+    const row2 = Object.keys(selectedObj[1])[0];
+    const col2 = selectedObj[1][row2];
+
+    if (row1 != -1 && row2 != -1) {
+      swap(row1, col1 - 1, row2, col2 - 1);
+    }
+
+    const newObj = {};
+    newObj[-1] = -1;
+    const newArr = [...selectedObj];
+    newArr[0] = newObj;
+    newArr[1] = newObj;
+    const newCellObjArr = [...cellObj];
+    newCellObjArr[0]["value"] = "Not selected";
+    newCellObjArr[1]["value"] = "Not selected";
+    setSelectedObj(newArr);
+    setCellObj(newCellObjArr);
   }
 
   // console.log(sttime, lsttime);
@@ -437,6 +447,13 @@ function Home() {
 
   // console.log(ccallcol);
   // console.log(allcol);
+  const handleCellObj = (e, idx1, idx2) => {
+    const newArr = [...cellObj];
+    newArr[idx1][e.target.value] = true;
+    newArr[idx2]["select"] = false;
+    newArr[idx2]["set"] = false;
+    setCellObj(newArr);
+  }
 
   const updateTT = () => {
     handleclick();
@@ -994,7 +1011,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                      // disabled="disabled"
+                    // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
@@ -1030,7 +1047,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                      // disabled="disabled"
+                    // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
@@ -1066,7 +1083,7 @@ function Home() {
                     <option
                       value="Select"
                       selected="true"
-                      // disabled="disabled"
+                    // disabled="disabled"
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
@@ -1121,7 +1138,97 @@ function Home() {
             </button>
           </div>
         </div>
-        <div className="flex flex-col w-4/5 mx-auto">{tbl}</div>
+        <div className="flex flex-col w-4/5 mx-auto">
+          <Table data={tblData}
+            cellObj={cellObj}
+            setCellObj={setCellObj}
+            selectedObj={selectedObj}
+            setSelectedObj={setSelectedObj}
+            columns={tblCols}
+            clickEnabled={clickEnabled}
+          />;
+        </div>
+        <div className="flex flex-row">
+          <div className="w-1/6 mx-auto align-center my-3">
+            <input type="checkbox"
+              id="enableclick"
+              defaultChecked={false}
+              onChange={enableClick}
+            />
+            <label style={{ 'color': 'black', marginLeft: 10 }} for="enableclick">Enable Cell Selection</label>
+          </div>
+          <div className="w-1/6 mx-auto align-center my-3">
+            <div className="my-3">
+              <button
+                value="select"
+                style={{ 'background': btnBgClr }}
+                onClick={e => handleCellObj(e, 0, 1)}
+                disabled={!clickEnabled}
+                className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              >
+                Select cell 1
+              </button>
+            </div>
+            <div className="flex flex-row">
+              <div className="w-1/3 mx-auto align-center my-3">
+                <button
+                  value="set"
+                  onClick={e => handleCellObj(e, 0, 1)}
+                  style={{ 'background': setBtnClr }}
+                  disabled={!clickEnabled}
+                  className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                >
+                  Set
+                </button>
+              </div>
+              <div style={{ 'color': 'black' }} className="w-1/3 mx-auto align-center my-3">
+                {cellObj[0]["value"]}
+              </div>
+            </div>
+
+          </div>
+
+          <div className="w-1/6 mx-auto align-center my-3">
+            <div className="my-3">
+              <button
+                value="select"
+                onClick={e => handleCellObj(e, 1, 0)}
+                style={{ 'background': btnBgClr }}
+                disabled={!clickEnabled}
+                className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              >
+                Select cell 2
+              </button>
+            </div>
+            <div className="flex flex-row">
+              <div className="w-1/3 mx-auto align-center my-3">
+                <button
+                  value="set"
+                  disabled={!clickEnabled}
+                  onClick={e => handleCellObj(e, 1, 0)}
+                  style={{ 'background': setBtnClr }}
+                  className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                >
+                  Set
+                </button>
+              </div>
+              <div style={{ 'color': 'black' }} className="w-1/3 mx-auto align-center my-3">
+                {cellObj[1]["value"]}
+              </div>
+            </div>
+          </div>
+
+          <div className="w-1/6 mx-auto align-center my-3">
+            <button
+              style={{ 'background': btnBgClr }}
+              onClick={handleSwap}
+              disabled={!clickEnabled}
+              className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            >
+              Swap cells
+            </button>
+          </div>
+        </div>
         <div className={"w-1/3 mx-auto align-center my-3"}>
           <button
             onClick={exportPDF}
