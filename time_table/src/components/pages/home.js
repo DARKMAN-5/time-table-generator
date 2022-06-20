@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import Table from "../navigation/table";
+import html2canvas from "html2canvas";
 
 function Home() {
   let ccallcol = [];
@@ -155,40 +156,47 @@ function Home() {
   const [tblCols, setTblCols] = useState([]);
 
   let exportPDF = () => {
-    const unit = "pt";
-    const size = "A4"; // Use A1, A2, A3 or A4
-    const orientation = "portrait"; // portrait or landscape
-
-    const doc = new jsPDF(orientation, unit, size);
-
-    doc.setFontSize(20);
-
-    const title = "Time Table";
-    doc.text(title, 250, 30);
-    doc.setFontSize(10);
-
-    let headers;
-    let data = [];
-    let ori = 50;
-    headers = [...timecol];
-    headers.unshift("Day");
-    // console.log("headers: ", headers);
-    allcol.map((col, index) => {
-      data.push([]);
-      data[index] = allcol[index].map((elt) => elt);
-      data[index].unshift(days[index]);
-      return 0;
-    });
-
-    // console.log("DATA: ", data);
-    let content = {
-      theme: "grid",
-      startY: ori,
-      head: [headers],
-      body: data,
-    };
-    doc.autoTable(content);
-    doc.save("Time-Table.pdf");
+    // option:1
+    window.print();
+    // ************************************************************************************
+    // option:2
+    // var prtContent = document.getElementById("tableId");
+    // var WinPrint = window.open("", "", "status=0");
+    // WinPrint.document.write(prtContent.innerHTML);
+    // WinPrint.document.close();
+    // // WinPrint.focus();
+    // WinPrint.print();
+    // // WinPrint.close();
+    // ***************************************************************************************
+    // option:3
+    // const unit = "pt";
+    // const size = "A4"; // Use A1, A2, A3 or A4
+    // const orientation = "landscape"; // portrait or landscape
+    // const doc = new jsPDF(orientation, unit, size);
+    // let prtContent = document.getElementById("tableId");
+    // console.log(prtContent);
+    // doc.html(prtContent.innerHTML, {
+    //   margin: [10, 20, 10, 20],
+    //   callback: function (doc) {
+    //     doc.save();
+    //   },
+    // });
+    // ************************************************************************************
+    // option:4
+    // const unit = "pt";
+    // const size = "A4"; // Use A1, A2, A3 or A4
+    // const orientation = "landscape"; // portrait or landscape
+    // const input = document.getElementById("tableId");
+    // html2canvas(input).then((canvas) => {
+    //   const imgData = canvas.toDataURL("image/png");
+    //   const pdf = new jsPDF(orientation, unit, size);
+    //   let wt = pdf.internal.pageSize.getWidth() - 100;
+    //   let ht = pdf.internal.pageSize.getHeight() - 300;
+    //   pdf.addImage(imgData, "JPEG", 0, 0, wt, ht);
+    //   // pdf.output('dataurlnewwindow');
+    //   pdf.save("time_table.pdf");
+    // });
+    // ***********************************************************************
   };
 
   function crtTable() {
@@ -524,6 +532,9 @@ function Home() {
       }
     }
 
+    let colsize = copyallcol[0].length;
+
+    console.log("setold", timecol);
     if (
       distribution.TP.hasOwnProperty(4) &&
       copyallcol[0].length - Lunch_idx - 1 < 4
@@ -532,13 +543,14 @@ function Home() {
         copyallcol[i].push(null);
       }
 
-      let st = timecol[timecol.length - 1];
+      let st = timecol[colsize - 1];
       let vl = st.split("-");
       let vt = vl[vl.length - 1].split(":");
       let nt = parseInt(vt[0]) + 1;
       st = vl[vl.length - 1] + "-" + nt + ":" + vt[1];
       setTimecol((prev) => [...prev, st]);
     }
+    console.log("setnew", timecol);
     console.log("old", copyallcol);
     for (let i = 0; i < copyallcol[0].length; i++) {
       for (let j = 0; j < copyallcol.length; j++) {
@@ -825,7 +837,7 @@ function Home() {
   };
 
   return (
-    <div className="mx-auto w-full">
+    <div className="mx-auto w-full print:invisible">
       <div className={lead === 0 ? "block w-2/3 mx-auto my-8" : "hidden"}>
         <div className="bg-bck-4 text-center rounded ">
           <div className="pt-5 text-xl font-semibold">TOTAL WEEKDAYS</div>
@@ -978,7 +990,10 @@ function Home() {
       </div>
 
       {/* *************************************************************************************************************** */}
-      <div className={lead !== 0 ? "block mx-10  py-5 rounded" : "hidden"}>
+      <div
+        className={lead !== 0 ? "block mx-10  py-5 rounded" : "hidden"}
+        id="secondpage"
+      >
         <div className=" flex flex-row flex-wrap justify-evenly">
           {courseInputs.map((obj) => (
             <div className="flex flex-row justify-evenly bg-bck-3 text-center rounded mb-1 py-2 w-1/4 mx-1">
@@ -1156,7 +1171,10 @@ function Home() {
           </div>
         </div>
         <div className="flex flex-row flex-wrap justify-evenly">
-          <div className="">
+          <div
+            className="print:visible print:absolute print:top-10"
+            id="tableId"
+          >
             <Table
               data={tblData}
               cellObj={cellObj}
