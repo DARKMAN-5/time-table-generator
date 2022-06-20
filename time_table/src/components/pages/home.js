@@ -517,9 +517,29 @@ function Home() {
     // console.log("Dict", dict);
 
     let copyallcol = [...ccallcol];
-
-    // console.log("old", copyallcol);
     let Lunch_idx = null;
+    for (let i = 0; i < copyallcol[0].length; i++) {
+      if (copyallcol[0][i] === "Lunch") {
+        Lunch_idx = i;
+      }
+    }
+
+    if (
+      distribution.TP.hasOwnProperty(4) &&
+      copyallcol[0].length - Lunch_idx - 1 < 4
+    ) {
+      for (let i = 0; i < copyallcol.length; i++) {
+        copyallcol[i].push(null);
+      }
+
+      let st = timecol[timecol.length - 1];
+      let vl = st.split("-");
+      let vt = vl[vl.length - 1].split(":");
+      let nt = parseInt(vt[0]) + 1;
+      st = vl[vl.length - 1] + "-" + nt + ":" + vt[1];
+      setTimecol((prev) => [...prev, st]);
+    }
+    console.log("old", copyallcol);
     for (let i = 0; i < copyallcol[0].length; i++) {
       for (let j = 0; j < copyallcol.length; j++) {
         if (
@@ -551,10 +571,6 @@ function Home() {
         ) {
           copyallcol[j][i] = null;
         }
-      }
-
-      if (copyallcol[0][i] === "Lunch") {
-        Lunch_idx = i;
       }
     }
 
@@ -802,7 +818,9 @@ function Home() {
       }
     }
 
-    setAllcol(copyallcol);
+    console.log("new", copyallcol);
+
+    setAllcol([...copyallcol]);
     setLead((prev) => prev + 1);
   };
 
