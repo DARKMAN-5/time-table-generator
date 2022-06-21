@@ -38,7 +38,7 @@ function Home() {
 
   const tempCourseInputs = [];
 
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 8; i++) {
     let course = new courseInfo("", 0, 0, "", 0, "", 0, "");
     tempCourseInputs.push(course);
   }
@@ -830,7 +830,7 @@ function Home() {
       }
     }
 
-    console.log("new", copyallcol);
+    // console.log("new", copyallcol);
 
     setAllcol([...copyallcol]);
     setLead((prev) => prev + 1);
@@ -996,8 +996,8 @@ function Home() {
       >
         <div className=" flex flex-row flex-wrap justify-evenly">
           {courseInputs.map((obj) => (
-            <div className="flex flex-row justify-evenly bg-bck-3 text-center rounded mb-1 py-2 w-1/4 mx-1">
-              <div className="w-full mx-1">
+            <div className="flex flex-row justify-evenly bg-bck-3 text-center rounded mb-1 py-2 w-1/5 mx-1">
+              <div className="w-full">
                 <div className="text-sm font-light">Course Code</div>
                 <input
                   type="text"
@@ -1006,7 +1006,7 @@ function Home() {
                   onChange={(event) => {
                     obj.courseCode = event.target.value;
                   }}
-                  className="rounded text-center outline-none text-black w-2/4"
+                  className="rounded text-center outline-none text-black w-1/2"
                   required
                 />
               </div>
@@ -1031,7 +1031,7 @@ function Home() {
                     required
                   />
 
-                  <select
+                  {/* <select
                     style={{ color: "black" }}
                     onChange={(e) => {
                       obj.lPr = e.target.value;
@@ -1047,7 +1047,7 @@ function Home() {
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
-                  </select>
+                  </select> */}
                 </div>
                 <div className="flex flex-col">
                   <div className="text-sm font-bold">T</div>
@@ -1068,7 +1068,7 @@ function Home() {
                     required
                   />
 
-                  <select
+                  {/* <select
                     style={{ color: "black" }}
                     onChange={(e) => {
                       obj.tPr = e.target.value;
@@ -1083,7 +1083,7 @@ function Home() {
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
-                  </select>
+                  </select> */}
                 </div>
                 <div className="flex flex-col mx-2">
                   <div className="text-sm font-bold">P</div>
@@ -1104,7 +1104,7 @@ function Home() {
                     required
                   />
 
-                  <select
+                  {/* <select
                     style={{ color: "black" }}
                     onChange={(e) => {
                       obj.pPr = e.target.value;
@@ -1119,10 +1119,10 @@ function Home() {
                     ></option>
                     <option value="morning">pre</option>
                     <option value="afternoon">post</option>
-                  </select>
+                  </select> */}
                 </div>
               </div>
-              <div className="mx-1 w-full">
+              {/* <div className="mx-1 w-full">
                 <div className="text-sm font-light mx-2">Lecture Time</div>
                 <select
                   style={{ color: "black" }}
@@ -1140,7 +1140,7 @@ function Home() {
                   <option value="1">1</option>
                   <option value="1.5">1.5</option>
                 </select>
-              </div>
+              </div> */}
             </div>
           ))}
         </div>
@@ -1185,92 +1185,94 @@ function Home() {
               clickEnabled={clickEnabled}
             />
           </div>
-          <div className="flex flex-col bg-bck-4 rounded p-10 my-auto">
-            <div className="mx-auto align-center">
-              <input
-                type="checkbox"
-                id="enableclick"
-                defaultChecked={false}
-                onChange={enableClick}
-              />
-              <label for="enableclick">Enable Cell Selection</label>
-            </div>
-            <div className="align-center">
-              <div className="my-3">
-                <button
-                  value="select"
-                  style={{ background: btnBgClr }}
-                  onClick={(e) => handleCellObj(e, 0, 1)}
-                  disabled={!clickEnabled}
-                  className="text-white bg-bck-3 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-400"
-                >
-                  Select cell 1
-                </button>
+          <div className="flex flex-col">
+            <div className="flex flex-col bg-bck-4 rounded p-10 my-auto">
+              <div className="mx-auto align-center">
+                <input
+                  type="checkbox"
+                  id="enableclick"
+                  defaultChecked={false}
+                  onChange={enableClick}
+                />
+                <label for="enableclick">Enable Cell Selection</label>
               </div>
-              <div className="">
-                <button
-                  value="set"
-                  onClick={(e) => handleCellObj(e, 0, 1)}
-                  style={{ background: btnBgClr }}
-                  disabled={!clickEnabled}
-                  className="text-white bg-bck-2 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-300 inline-block"
-                >
-                  Set
-                </button>
-                <div className="ml-2 my-auto inline-block">
-                  {cellObj[0]["value"]}
+              <div className="align-center">
+                <div className="my-3">
+                  <button
+                    value="select"
+                    style={{ background: btnBgClr }}
+                    onClick={(e) => handleCellObj(e, 0, 1)}
+                    disabled={!clickEnabled}
+                    className="text-white bg-bck-3 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-400"
+                  >
+                    Select cell 1
+                  </button>
+                </div>
+                <div className="">
+                  <button
+                    value="set"
+                    onClick={(e) => handleCellObj(e, 0, 1)}
+                    style={{ background: btnBgClr }}
+                    disabled={!clickEnabled}
+                    className="text-white bg-bck-2 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-300 inline-block"
+                  >
+                    Set
+                  </button>
+                  <div className="ml-2 my-auto inline-block">
+                    {cellObj[0]["value"]}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="align-center my-3">
-              <div className="my-3">
-                <button
-                  value="select"
-                  onClick={(e) => handleCellObj(e, 1, 0)}
-                  style={{ background: btnBgClr }}
-                  disabled={!clickEnabled}
-                  className="text-white bg-bck-3 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-400"
-                >
-                  Select cell 2
-                </button>
-              </div>
-              <div className="">
-                <button
-                  value="set"
-                  disabled={!clickEnabled}
-                  onClick={(e) => handleCellObj(e, 1, 0)}
-                  style={{ background: btnBgClr }}
-                  className="text-white bg-bck-2 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-300 inline-block"
-                >
-                  Set
-                </button>
+              <div className="align-center my-3">
+                <div className="my-3">
+                  <button
+                    value="select"
+                    onClick={(e) => handleCellObj(e, 1, 0)}
+                    style={{ background: btnBgClr }}
+                    disabled={!clickEnabled}
+                    className="text-white bg-bck-3 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-400"
+                  >
+                    Select cell 2
+                  </button>
+                </div>
+                <div className="">
+                  <button
+                    value="set"
+                    disabled={!clickEnabled}
+                    onClick={(e) => handleCellObj(e, 1, 0)}
+                    style={{ background: btnBgClr }}
+                    className="text-white bg-bck-2 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-300 inline-block"
+                  >
+                    Set
+                  </button>
 
-                <div className="ml-2 align-center my-auto inline-block">
-                  {cellObj[1]["value"]}
+                  <div className="ml-2 align-center my-auto inline-block">
+                    {cellObj[1]["value"]}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="mx-auto align-center my-3">
+              <div className="mx-auto align-center my-3">
+                <button
+                  style={{ background: btnBgClr }}
+                  onClick={handleSwap}
+                  disabled={!clickEnabled}
+                  className=" text-white bg-bck-3 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-500"
+                >
+                  Swap cells
+                </button>
+              </div>
+            </div>
+            <div className={"mx-auto align-center my-3"}>
               <button
-                style={{ background: btnBgClr }}
-                onClick={handleSwap}
-                disabled={!clickEnabled}
-                className=" text-white bg-bck-3 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-500"
+                onClick={exportPDF}
+                className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
               >
-                Swap cells
+                Print Time Table
               </button>
             </div>
           </div>
-        </div>
-        <div className={"w-1/3 mx-auto align-center my-3"}>
-          <button
-            onClick={exportPDF}
-            className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
-          >
-            Print Time Table
-          </button>
         </div>
       </div>
 
