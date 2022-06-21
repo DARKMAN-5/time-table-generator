@@ -6,7 +6,7 @@ import html2canvas from "html2canvas";
 
 function Home() {
   let ccallcol = [];
-  const [rows, setRows] = useState(null);
+  const [rows, setRows] = useState(5);
   const [timecol, setTimecol] = useState(null);
   const [sttime, setSttime] = useState("8:00");
   const [lsttime, setLsttime] = useState(null);
@@ -836,28 +836,24 @@ function Home() {
     setLead((prev) => prev + 1);
   };
 
+  // console.log("rows", rows);
   return (
     <div className="mx-auto w-full print:invisible">
       <div className={lead === 0 ? "block w-2/3 mx-auto my-8" : "hidden"}>
         <div className="bg-bck-4 text-center rounded ">
           <div className="pt-5 text-xl font-semibold">TOTAL WEEKDAYS</div>
-          <input
-            type="number"
-            name="rows"
-            id="rows"
-            onChange={(event) => {
-              if (event.target.value < 7 && event.target.value > 0) {
-                setRows(event.target.value);
-              } else {
-                setRows("");
-              }
-            }}
+          <select
             value={rows}
-            min={1}
-            max={7}
-            className="rounded  my-3 text-center outline-none text-black"
-            required
-          />
+            onChange={(event) => {
+              setRows(parseInt(event.target.value));
+            }}
+            style={{ color: "black" }}
+            id="rows"
+            name="rows"
+          >
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
           {/* {rows} */}
           {/* <br /> */}
           <div className="text-center rounded my-3 py-2 flex flex-row flex-wrap justify-evenly">
@@ -980,7 +976,7 @@ function Home() {
           </p>
           <div className="w-1/3 mx-auto align-center">
             <button
-              onClick={rows === null ? null : handleclick}
+              onClick={handleclick}
               className="w-full my-10 text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-m px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
             >
               Generate
