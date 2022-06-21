@@ -113,7 +113,8 @@ const Table = ({
             {headerGroup.headers.map((column) => (
               <th
                 style={{
-                  padding: "10px",
+                  fontSize: 13,
+                  padding: "5px",
                   border: "solid 1px gray",
                   background: "aliceblue",
                   color: "black",
@@ -155,7 +156,8 @@ const Table = ({
                   <td
                     onClick={() => getCellValue(cell, j)}
                     style={{
-                      padding: "10px",
+                      fontSize: 14,
+                      padding: "4px",
                       border: "solid 1px gray",
                       background: finalExpBg,
                       color: finalExpClr,
