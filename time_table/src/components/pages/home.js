@@ -1168,7 +1168,7 @@ function Home() {
         </div>
         <div className="flex flex-row flex-wrap justify-evenly">
           <div
-            className="print:visible print:absolute print:top-10"
+            className=" print:visible print:absolute print:top-10"
             id="tableId"
           >
             <Table
@@ -1182,7 +1182,7 @@ function Home() {
             />
           </div>
           <div className="flex flex-col">
-            <div className="flex flex-col bg-bck-4 rounded p-10 my-auto">
+            <div className="flex flex-col bg-bck-4 rounded p-5 my-auto">
               <div className="mx-auto align-center">
                 <input
                   type="checkbox"
@@ -1193,59 +1193,54 @@ function Home() {
                 <label for="enableclick">Enable Cell Selection</label>
               </div>
               <div className="align-center">
-                <div className="my-3">
+                <div className="my-3 flex justify-between">
                   <button
                     value="select"
                     style={{ background: btnBgClr }}
                     onClick={(e) => handleCellObj(e, 0, 1)}
                     disabled={!clickEnabled}
-                    className="text-white bg-bck-3 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-400"
+                    className=" text-white bg-bck-3 font-medium rounded text-sm px-2 py-1.5 dark:hover:bg-blue-400"
                   >
                     Select cell 1
                   </button>
-                </div>
-                <div className="">
                   <button
                     value="set"
                     onClick={(e) => handleCellObj(e, 0, 1)}
                     style={{ background: btnBgClr }}
                     disabled={!clickEnabled}
-                    className="text-white bg-bck-2 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-300 inline-block"
+                    className="text-white bg-bck-2 font-medium rounded text-sm px-5 py-1.5 dark:hover:bg-blue-300"
                   >
                     Set
                   </button>
-                  <div className="ml-2 my-auto inline-block">
-                    {cellObj[0]["value"]}
-                  </div>
+                </div>
+                <div className="ml-2 my-auto inline-block">
+                  {cellObj[0]["value"]}
                 </div>
               </div>
 
-              <div className="align-center my-3">
-                <div className="my-3">
+              <div className="align-center">
+                <div className="my-3 flex justify-between">
                   <button
                     value="select"
                     onClick={(e) => handleCellObj(e, 1, 0)}
                     style={{ background: btnBgClr }}
                     disabled={!clickEnabled}
-                    className="text-white bg-bck-3 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-400"
+                    className="text-white bg-bck-3 font-medium rounded text-sm px-2 py-1.5 dark:hover:bg-blue-400"
                   >
                     Select cell 2
                   </button>
-                </div>
-                <div className="">
                   <button
                     value="set"
                     disabled={!clickEnabled}
                     onClick={(e) => handleCellObj(e, 1, 0)}
                     style={{ background: btnBgClr }}
-                    className="text-white bg-bck-2 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-300 inline-block"
+                    className="text-white bg-bck-2 font-medium rounded text-sm px-5 py-1.5 dark:hover:bg-blue-300 inline-block"
                   >
                     Set
                   </button>
-
-                  <div className="ml-2 align-center my-auto inline-block">
-                    {cellObj[1]["value"]}
-                  </div>
+                </div>
+                <div className="ml-2 align-center my-auto inline-block">
+                  {cellObj[1]["value"]}
                 </div>
               </div>
 
@@ -1254,7 +1249,7 @@ function Home() {
                   style={{ background: btnBgClr }}
                   onClick={handleSwap}
                   disabled={!clickEnabled}
-                  className=" text-white bg-bck-3 font-medium rounded text-sm px-5 py-2.5 dark:hover:bg-blue-500"
+                  className=" text-white bg-bck-3 font-medium rounded text-sm px-2 py-1.5 dark:hover:bg-blue-500"
                 >
                   Swap cells
                 </button>

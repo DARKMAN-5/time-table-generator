@@ -106,16 +106,17 @@ const Table = ({
   }
 
   return (
-    <table {...getTableProps()} style={{ border: "solid 1px blue" }}>
+    <table {...getTableProps()} style={{ border: "solid 2px black" }}>
       <thead>
         {headerGroups.map((headerGroup) => (
           <tr {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
               <th
                 style={{
+                  textAlign: "center",
                   fontSize: 13,
-                  padding: "5px",
-                  border: "solid 1px gray",
+                  padding: "0px 5px 0px 5px",
+                  border: "solid 2px black",
                   background: "aliceblue",
                   color: "black",
                 }}
@@ -156,9 +157,10 @@ const Table = ({
                   <td
                     onClick={() => getCellValue(cell, j)}
                     style={{
+                      textAlign: "center",
                       fontSize: 14,
-                      padding: "4px",
-                      border: "solid 1px gray",
+                      padding: "0px 5px 0px 5px",
+                      border: "solid 1px black",
                       background: finalExpBg,
                       color: finalExpClr,
                     }}
