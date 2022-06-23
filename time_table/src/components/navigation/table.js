@@ -114,8 +114,9 @@ const Table = ({
               <th
                 style={{
                   textAlign: "center",
-                  fontSize: 13,
-                  padding: "0px 5px 0px 5px",
+                  fontSize: 16,
+                  padding: "1px 5px 1px 5px",
+                  // padding: "2px",
                   border: "solid 2px black",
                   background: "aliceblue",
                   color: "black",
@@ -158,8 +159,9 @@ const Table = ({
                     onClick={() => getCellValue(cell, j)}
                     style={{
                       textAlign: "center",
-                      fontSize: 14,
-                      padding: "0px 5px 0px 5px",
+                      fontSize: 15,
+                      padding: "1px 5px 1px 5px",
+                      // padding: "2px",
                       border: "solid 1px black",
                       background: finalExpBg,
                       color: finalExpClr,

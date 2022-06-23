@@ -13,8 +13,11 @@ function Home() {
   const [lead, setLead] = useState(0);
   const [oallp, setOallp] = useState(null);
   const [sectn, setSectn] = useState(1);
+  const [batch, setBatch] = useState(1);
   const [clickEnabled, setClickEnabled] = useState(false);
   const [selectedObj, setSelectedObj] = useState([]);
+  const [prnt1, setPrnt1] = useState(0);
+  const [prnt2, setPrnt2] = useState(0);
 
   const tempArr = [];
 
@@ -38,7 +41,7 @@ function Home() {
 
   const tempCourseInputs = [];
 
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 9; i++) {
     let course = new courseInfo("", 0, 0, "", 0, "", 0, "");
     tempCourseInputs.push(course);
   }
@@ -153,7 +156,23 @@ function Home() {
 
   // console.log(allcol);
   const [tblData, setTblData] = useState([]);
+  const [newtblData, setNewtblData] = useState([]);
   const [tblCols, setTblCols] = useState([]);
+
+  const rotateArray2 = (nums, k, n) => {
+    // reverse helper function
+    console.log("bnd", nums);
+    for (let i = 0; i < n * k; i++) {
+      nums.unshift(nums.pop());
+    }
+    let j = 0;
+    for (let i = 0; i < nums.length; i += n) {
+      nums[i]["col1"] = days[j];
+      j++;
+    }
+    console.log("and", nums);
+    return nums;
+  };
 
   let exportPDF = () => {
     // option:1
@@ -214,7 +233,7 @@ function Home() {
     ];
 
     for (let i = 0; i < timecol.length; i++) {
-      let st = "col" + i + 2;
+      let st = "col" + (i + 2);
       let vl = {
         Header: timecol[i],
         accessor: st,
@@ -223,13 +242,13 @@ function Home() {
     }
 
     allcol.map((col, index) => {
-      if (sectn === 1) {
+      if (batch === 1) {
         let ml = {
           col1: days[index],
         };
 
         data.push(ml);
-      } else if (sectn === 2 && index % 2 === 0) {
+      } else if (batch === 2 && index % 2 === 0) {
         let ml = {
           col1: days[index / 2],
         };
@@ -244,14 +263,34 @@ function Home() {
       }
 
       for (let i = 0; i < allcol[index].length; i++) {
-        let st = "col" + i + 2;
+        let st = "col" + (i + 2);
         data[index][st] = allcol[index][i];
       }
 
       return null;
     });
 
+    let newdata = JSON.parse(JSON.stringify(data));
+    if (batch === 2) {
+      newdata = rotateArray2(newdata, 2, 2);
+
+      for (let i = 0; i < newdata.length; i++) {
+        for (let j = 0; j < Object.keys(newdata[i]).length - 1; j++) {
+          // console.log("val", newdata[i]["col" + (j + 2)]);
+          if (
+            newdata[i]["col" + (j + 2)] !== null &&
+            newdata[i]["col" + (j + 2)].charAt(0) === "A"
+          ) {
+            newdata[i]["col" + (j + 2)] =
+              "B" + newdata[i]["col" + (j + 2)].substring(1);
+          }
+        }
+      }
+    } else {
+      newdata = rotateArray2(newdata, 2, 1);
+    }
     setTblData(data);
+    setNewtblData(newdata);
     setTblCols(columns);
   }
 
@@ -417,7 +456,7 @@ function Home() {
           j++;
         }
         // console.log("After", nls);
-        for (let j = 0; j < sectn; j++) {
+        for (let j = 0; j < batch; j++) {
           ccallcol.push([...nls]);
           setAllcol((prev) => [...prev, ls]);
         }
@@ -442,7 +481,7 @@ function Home() {
           j++;
         }
         // console.log("After", nls);
-        for (let j = 0; j < sectn; j++) {
+        for (let j = 0; j < batch; j++) {
           ccallcol.push([...nls]);
           setAllcol((prev) => [...prev, ls]);
         }
@@ -555,7 +594,7 @@ function Home() {
     for (let i = 0; i < copyallcol[0].length; i++) {
       for (let j = 0; j < copyallcol.length; j++) {
         if (
-          sectn === 1 &&
+          batch === 1 &&
           copyallcol[j][i] !== null &&
           dict[copyallcol[j][i]] !== undefined
         ) {
@@ -566,7 +605,7 @@ function Home() {
             copyallcol[j][i] = null;
           }
         } else if (
-          sectn === 2 &&
+          batch === 2 &&
           j % 2 === 0 &&
           copyallcol[j][i] !== null &&
           dict[copyallcol[j][i]] !== undefined
@@ -591,7 +630,7 @@ function Home() {
     let arrP = Object.keys(distribution.TP).reverse();
     for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
       for (let j = 0; j < copyallcol.length; j++) {
-        if (sectn === 1 && copyallcol[j][i] === null) {
+        if (batch === 1 && copyallcol[j][i] === null) {
           let i1 = i;
           let val = copyallcol[0].length - i;
           // console.log("VAL", val);
@@ -630,7 +669,7 @@ function Home() {
             }
           }
           // console.log("inside", copyallcol);
-        } else if (sectn === 2 && j % 2 === 0 && copyallcol[j][i] === null) {
+        } else if (batch === 2 && j % 2 === 0 && copyallcol[j][i] === null) {
           let i1 = i;
           let val = copyallcol[0].length - i;
           // console.log("VAL", val);
@@ -640,12 +679,12 @@ function Home() {
           ) {
             let sub = distribution.TP[val][0];
             distribution.TP[val].shift();
-            copyallcol[j][i1] = "A:" + sub + "[T]";
-            copyallcol[(j + 3) % 10][i1] = "B:" + sub + "[T]";
+            copyallcol[j][i1] = "A1:" + sub + "[T]";
+            copyallcol[(j + 3) % 10][i1] = "A2:" + sub + "[T]";
             i1++;
             while (i1 < copyallcol[0].length && val-- > 1) {
-              copyallcol[j][i1] = "A:" + sub + "[L]";
-              copyallcol[(j + 3) % 10][i1] = "B:" + sub + "[L]";
+              copyallcol[j][i1] = "A1:" + sub + "[L]";
+              copyallcol[(j + 3) % 10][i1] = "A2:" + sub + "[L]";
               i1++;
             }
             last = (j + 3) % 10;
@@ -664,12 +703,12 @@ function Home() {
             val = parseInt(arrP[k]);
             let sub = distribution.TP[val][0];
             distribution.TP[val].shift();
-            copyallcol[j][i1] = "A:" + sub + "[T]";
-            copyallcol[(j + 3) % 10][i1] = "B:" + sub + "[T]";
+            copyallcol[j][i1] = "A1:" + sub + "[T]";
+            copyallcol[(j + 3) % 10][i1] = "A2:" + sub + "[T]";
             i1++;
             while (i1 < copyallcol[0].length && val-- > 1) {
-              copyallcol[j][i1] = "A:" + sub + "[L]";
-              copyallcol[(j + 3) % 10][i1] = "B:" + sub + "[L]";
+              copyallcol[j][i1] = "A1:" + sub + "[L]";
+              copyallcol[(j + 3) % 10][i1] = "A2:" + sub + "[L]";
               last = (j + 3) % 10;
               i1++;
             }
@@ -686,7 +725,7 @@ function Home() {
     for (let i = 0; i < copyallcol[0].length; i++) {
       for (let j = 0; j < copyallcol.length; j++) {
         if (
-          sectn === 1 &&
+          batch === 1 &&
           distribution.T.hasOwnProperty(1) &&
           distribution.T[1].length > 0 &&
           copyallcol[j][i] === null
@@ -694,7 +733,7 @@ function Home() {
           copyallcol[j][i] = distribution.T[1][0] + "[T]";
           distribution.T[1].shift();
         } else if (
-          sectn === 2 &&
+          batch === 2 &&
           distribution.T.hasOwnProperty(1) &&
           distribution.T[1].length > 0 &&
           j % 2 === 0 &&
@@ -702,20 +741,22 @@ function Home() {
         ) {
           if (i > Lunch_idx) {
             if (copyallcol[j + 1][i] === null) {
-              copyallcol[j][i] = "A:" + distribution.T[1][0] + "[T]";
+              copyallcol[j][i] = "A1:" + distribution.T[1][0] + "[T]";
               copyallcol[j + 1][i] = flag
-                ? "B:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
+                ? "A2:" +
+                  distribution.T[1][distribution.T[1].length - 1] +
+                  "[T]"
                 : prevT;
-              prevT = "B:" + distribution.T[1][0] + "[T]";
+              prevT = "A2:" + distribution.T[1][0] + "[T]";
               flag = false;
               distribution.T[1].shift();
             }
           } else {
-            copyallcol[j][i] = "A:" + distribution.T[1][0] + "[T]";
+            copyallcol[j][i] = "A1:" + distribution.T[1][0] + "[T]";
             copyallcol[j + 1][i] = flag
-              ? "B:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
+              ? "A2:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
               : prevT;
-            prevT = "B:" + distribution.T[1][0] + "[T]";
+            prevT = "A2:" + distribution.T[1][0] + "[T]";
             flag = false;
             distribution.T[1].shift();
           }
@@ -728,7 +769,7 @@ function Home() {
     arrP = Object.keys(distribution.P).reverse();
     for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
       for (let j = 0; j < copyallcol.length; j++) {
-        if (sectn === 1 && copyallcol[j][i] === null) {
+        if (batch === 1 && copyallcol[j][i] === null) {
           let i1 = i;
           let val = copyallcol[0].length - i;
           // console.log("VAL", val);
@@ -763,7 +804,7 @@ function Home() {
             }
           }
           // console.log("inside", copyallcol);
-        } else if (sectn === 2 && j % 2 === 0 && copyallcol[j][i] === null) {
+        } else if (batch === 2 && j % 2 === 0 && copyallcol[j][i] === null) {
           let i1 = i;
           let val = copyallcol[0].length - i;
           // console.log("VAL", val);
@@ -774,8 +815,8 @@ function Home() {
             let sub = distribution.P[val][0];
             distribution.P[val].shift();
             while (i1 < copyallcol[0].length && val--) {
-              copyallcol[j][i1] = "A:" + sub + "[L]";
-              copyallcol[(j + 3) % 10][i1] = "B:" + sub + "[L]";
+              copyallcol[j][i1] = "A1:" + sub + "[L]";
+              copyallcol[(j + 3) % 10][i1] = "A2:" + sub + "[L]";
               i1++;
             }
             if ((j + 3) % 10 > last) {
@@ -797,8 +838,8 @@ function Home() {
             let sub = distribution.P[val][0];
             distribution.P[val].shift();
             while (i1 < copyallcol[0].length && val--) {
-              copyallcol[j][i1] = "A:" + sub + "[L]";
-              copyallcol[(j + 3) % 10][i1] = "B:" + sub + "[L]";
+              copyallcol[j][i1] = "A1:" + sub + "[L]";
+              copyallcol[(j + 3) % 10][i1] = "A2:" + sub + "[L]";
               i1++;
             }
             if ((j + 3) % 10 > last) {
@@ -812,7 +853,7 @@ function Home() {
 
     // console.log("LAST", last);
 
-    if (sectn === 2) {
+    if (batch === 2) {
       let cc = 0;
       for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
         if (copyallcol[1][i] === null) {
@@ -839,7 +880,7 @@ function Home() {
   // console.log("rows", rows);
   return (
     <div className="mx-auto w-full print:invisible">
-      <div className={lead === 0 ? "block w-2/3 mx-auto my-8" : "hidden"}>
+      <div className={lead === 0 ? "block w-2/3 mx-auto my-10" : "hidden"}>
         <div className="bg-bck-4 text-center rounded ">
           <div className="pt-5 text-xl font-semibold">TOTAL WEEKDAYS</div>
           <select
@@ -958,10 +999,24 @@ function Home() {
             </div>
 
             <div className="bg-bck-3 p-5 m-5 w-64 rounded">
-              <div className="text-l font-semibold">7. TOTAL BATCH</div>
+              <div className="text-l font-semibold">7. TOTAL SECTION</div>
               <select
                 value={sectn}
                 onChange={(e) => setSectn(parseInt(e.target.value))}
+                style={{ color: "black" }}
+                id="section"
+                name="section"
+              >
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+            </div>
+
+            <div className="bg-bck-3 p-5 m-5 w-64 rounded">
+              <div className="text-l font-semibold">8. BATCH PER SECTION</div>
+              <select
+                value={batch}
+                onChange={(e) => setBatch(parseInt(e.target.value))}
                 style={{ color: "black" }}
                 id="section"
                 name="section"
@@ -979,7 +1034,7 @@ function Home() {
               onClick={handleclick}
               className="w-full my-10 text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-m px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
             >
-              Generate
+              Next &raquo;
             </button>
           </div>
         </div>
@@ -987,14 +1042,18 @@ function Home() {
 
       {/* *************************************************************************************************************** */}
       <div
-        className={lead !== 0 ? "block mx-10  py-5 rounded" : "hidden"}
+        className={
+          lead === 1
+            ? "p-10 rounded block w-3/4 mx-auto bg-bck-4 text-center my-10"
+            : "hidden"
+        }
         id="secondpage"
       >
-        <div className=" flex flex-row flex-wrap justify-evenly">
+        <div className=" flex flex-row flex-wrap justify-evenly ">
           {courseInputs.map((obj) => (
-            <div className="flex flex-row justify-evenly bg-bck-3 text-center rounded mb-1 py-2 w-1/5 mx-1">
+            <div className="w-1/4 flex flex-row justify-evenly bg-bck-3 text-center rounded my-5 mx-2 py-4 px-2">
               <div className="w-full">
-                <div className="text-sm font-light">Course Code</div>
+                <div className="text-sm font-bold">CC</div>
                 <input
                   type="text"
                   name="course_code"
@@ -1140,21 +1199,21 @@ function Home() {
             </div>
           ))}
         </div>
+        <p className="text-xs font-thin text-yellow-300 mt-2">
+          CC - COURSE CODE
+        </p>
+        <p className="text-xs font-thin text-yellow-300">L - LECTURE</p>
+        <p className="text-xs font-thin text-yellow-300">T - TUTORIAL</p>
+        <p className="text-xs font-thin text-yellow-300 mb-2">
+          P - PRACTICAL / LAB
+        </p>
         <div className="flex flex-row">
           <div className="w-1/6 mx-auto align-center my-3">
             <button
               onClick={() => window.location.reload()}
               className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
             >
-              Back
-            </button>
-          </div>
-          <div className="w-1/6 mx-auto align-center my-3">
-            <button
-              onClick={updateTT}
-              className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
-            >
-              Update
+              &laquo; Back
             </button>
           </div>
           <div className="w-1/6 mx-auto align-center my-3">
@@ -1165,24 +1224,111 @@ function Home() {
               Add
             </button>
           </div>
+          <div className="w-1/6 mx-auto align-center my-3">
+            <button
+              onClick={updateTT}
+              className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
+            >
+              Generate &raquo;
+            </button>
+          </div>
         </div>
+      </div>
+
+      <div
+        className={
+          lead !== 0 && lead !== 1
+            ? "mx-10  py-5 rounded flex flex-col"
+            : "hidden"
+        }
+        id="Thirdpage"
+      >
         <div className="flex flex-row flex-wrap justify-evenly">
           <div
-            className=" print:visible print:absolute print:top-10"
-            id="tableId"
+            className={
+              prnt1 === 1 && prnt2 === 1
+                ? "flex flex-col flex-wrap justify-evenly print:visible print:absolute print:top-10"
+                : "flex flex-col flex-wrap justify-evenly"
+            }
           >
-            <Table
-              data={tblData}
-              cellObj={cellObj}
-              setCellObj={setCellObj}
-              selectedObj={selectedObj}
-              setSelectedObj={setSelectedObj}
-              columns={tblCols}
-              clickEnabled={clickEnabled}
-            />
+            <div
+              className={
+                prnt1 === 1 && prnt2 === 0
+                  ? "print:visible print:absolute print:top-10"
+                  : ""
+              }
+              id="tableId1"
+            >
+              <div className="font-bold text-xl text-black text-center">
+                SECTION 1
+              </div>
+              <div className="flex flex-row mb-3">
+                <Table
+                  data={tblData}
+                  cellObj={cellObj}
+                  setCellObj={setCellObj}
+                  selectedObj={selectedObj}
+                  setSelectedObj={setSelectedObj}
+                  columns={tblCols}
+                  clickEnabled={clickEnabled}
+                />
+                <input
+                  type="checkbox"
+                  id="enableclick"
+                  className="print:invisible w-4 h-4"
+                  defaultChecked={false}
+                  onChange={() => {
+                    setPrnt1((prev) => {
+                      if (prev === 1) {
+                        return 0;
+                      }
+                      return 1;
+                    });
+                  }}
+                />
+              </div>
+            </div>
+            <div className={sectn === 2 ? "" : "hidden"} id="tableId2">
+              <div
+                className={
+                  prnt2 === 1 && prnt1 === 0
+                    ? "print:visible print:absolute print:top-10"
+                    : ""
+                }
+              >
+                <div className="font-bold text-xl text-black text-center">
+                  SECTION 2
+                </div>
+                <div className="flex flex-row">
+                  <Table
+                    data={newtblData}
+                    cellObj={cellObj}
+                    setCellObj={setCellObj}
+                    selectedObj={selectedObj}
+                    setSelectedObj={setSelectedObj}
+                    columns={tblCols}
+                    clickEnabled={clickEnabled}
+                  />
+                  <input
+                    type="checkbox"
+                    id="enableclick"
+                    className="print:invisible w-4 h-4"
+                    defaultChecked={false}
+                    onChange={() => {
+                      setPrnt2((prev) => {
+                        if (prev === 1) {
+                          return 0;
+                        }
+                        return 1;
+                      });
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <div className="flex flex-col bg-bck-4 rounded p-5 my-auto">
+          <div className="my-auto">
+            <div className="flex flex-col bg-bck-4 rounded p-5 my-2">
               <div className="mx-auto align-center">
                 <input
                   type="checkbox"
@@ -1255,18 +1401,32 @@ function Home() {
                 </button>
               </div>
             </div>
-            <div className={"mx-auto align-center my-3"}>
-              <button
-                onClick={exportPDF}
-                className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
-              >
-                Print Time Table
-              </button>
+            <p className="text-xs font-thin text-violet-700 mt-2 text-center ">
+              **To Print, first Select the
+              <hr />
+              table by clicking chekbox
+            </p>
+            <div className="flex flex-row">
+              <div className="my-5 align-center mx-auto">
+                <button
+                  onClick={() => setLead(1)}
+                  className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
+                >
+                  &laquo; Back
+                </button>
+              </div>
+              <div className={"mx-auto align-center my-5"}>
+                <button
+                  onClick={exportPDF}
+                  className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
+                >
+                  Print &raquo;
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
       {/* ********************************************************************************************* */}
     </div>
   );
