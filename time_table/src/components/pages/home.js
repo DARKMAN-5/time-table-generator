@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import jsPDF from "jspdf";
+// import jsPDF from "jspdf";
 import "jspdf-autotable";
 import Table from "../navigation/table";
-import html2canvas from "html2canvas";
+// import html2canvas from "html2canvas";
 
 function Home() {
   let ccallcol = [];
@@ -30,7 +30,6 @@ function Home() {
 
   const [cellObj1, setCellObj1] = useState(tempArr);
   const [cellObj2, setCellObj2] = useState(tempArr);
-
 
   function courseInfo(courseCode, totalLectures, l, lPr, t, tPr, p, pPr) {
     this.courseCode = courseCode;
@@ -332,7 +331,7 @@ function Home() {
         swap(row1, col1 + 1, row2, col2 + 1);
       }
     }
-  }
+  };
 
   const resetTable = () => {
     const newObj = {};
@@ -347,7 +346,7 @@ function Home() {
     setSelectedObj2(newArr);
     setCellObj1(newCellObjArr);
     setCellObj2(newCellObjArr);
-  }
+  };
 
   const handleSwap = () => {
     if (currSection === 1) {
@@ -782,8 +781,8 @@ function Home() {
               copyallcol[j][i] = "A1:" + distribution.T[1][0] + "[T]";
               copyallcol[j + 1][i] = flag
                 ? "A2:" +
-                distribution.T[1][distribution.T[1].length - 1] +
-                "[T]"
+                  distribution.T[1][distribution.T[1].length - 1] +
+                  "[T]"
                 : prevT;
               prevT = "A2:" + distribution.T[1][0] + "[T]";
               flag = false;
@@ -1444,7 +1443,7 @@ function Home() {
             <p className="text-xs font-thin text-violet-700 mt-2 text-center ">
               **To Print, first Select the
               <hr />
-              table by clicking chekbox
+              table by clicking the chekbox
             </p>
             <div className="flex flex-row">
               <div className="my-5 align-center mx-auto">
