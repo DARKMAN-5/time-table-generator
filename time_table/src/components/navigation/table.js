@@ -11,6 +11,8 @@ const Table = ({
   selectedObj,
   setSelectedObj,
   handleSwap,
+  section,
+  setCurrSection,
   ...rest
 }) => {
   const tableColumns = useMemo(() => columns, [columns]);
@@ -57,20 +59,24 @@ const Table = ({
     }
   };
 
-  const resetCellObj = (idx) => {
+  const resetCellObj = (idx, setValFlag) => {
     const newArr = [...cellObj];
     newArr[idx]["select"] = false;
     newArr[idx]["set"] = false;
+    if (setValFlag === true) {
+      newArr[idx]["value"] = "Not selected";
+    }
     setCellObj(newArr);
   };
 
   useEffect(() => {
     if (clickEnabled === false) {
       reinitailizeRowCol();
-      resetCellObj(0);
-      resetCellObj(1);
+      resetCellObj(0, true);
+      resetCellObj(1, true);
       const newArr = [];
       setSelectedObj(newArr);
+      setCurrSection(-1);
     }
     // eslint-disable-next-line
   }, [clickEnabled]);
@@ -94,6 +100,7 @@ const Table = ({
 
   const getCellValue = (e, j) => {
     if (cellObj[0]["select"] === true || cellObj[1]["select"] === true) {
+      setCurrSection(section);
       setSelectedRow(e.row);
       setSelectedCol(j);
       setSelectedVal(e.value);
@@ -137,9 +144,9 @@ const Table = ({
               {row.cells.map((cell, j) => {
                 const exp1 =
                   (row.id === selectedRow.id && j === selectedCol) ||
-                  selectedObj.filter(function (e) {
-                    return e[row.id] === j;
-                  }).length > 0
+                    selectedObj.filter(function (e) {
+                      return e[row.id] === j;
+                    }).length > 0
                     ? "#FEB2C3"
                     : "papayawhip";
                 const exp2 = cell.value === "Break" ? "#73a2d9" : exp1;
@@ -149,8 +156,8 @@ const Table = ({
 
                 const finalExpClr =
                   cell.value === "Break" ||
-                  cell.value === "Lunch" ||
-                  cell.column.Header === "Day"
+                    cell.value === "Lunch" ||
+                    cell.column.Header === "Day"
                     ? "white"
                     : "black";
 
