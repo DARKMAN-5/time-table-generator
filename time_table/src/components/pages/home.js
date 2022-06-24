@@ -15,7 +15,9 @@ function Home() {
   const [sectn, setSectn] = useState(1);
   const [batch, setBatch] = useState(1);
   const [clickEnabled, setClickEnabled] = useState(false);
-  const [selectedObj, setSelectedObj] = useState([]);
+  const [selectedObj1, setSelectedObj1] = useState([]);
+  const [selectedObj2, setSelectedObj2] = useState([]);
+  const [currSection, setCurrSection] = useState(-1);
   const [prnt1, setPrnt1] = useState(0);
   const [prnt2, setPrnt2] = useState(0);
 
@@ -26,7 +28,9 @@ function Home() {
     tempArr.push(obj);
   }
 
-  const [cellObj, setCellObj] = useState(tempArr);
+  const [cellObj1, setCellObj1] = useState(tempArr);
+  const [cellObj2, setCellObj2] = useState(tempArr);
+
 
   function courseInfo(courseCode, totalLectures, l, lPr, t, tPr, p, pPr) {
     this.courseCode = courseCode;
@@ -299,35 +303,60 @@ function Home() {
   };
 
   const swap = (row1, col1, row2, col2) => {
-    let newAllCol = [...allcol];
-    let temp = newAllCol[row1][col1];
-    newAllCol[row1][col1] = newAllCol[row2][col2];
-    newAllCol[row2][col2] = temp;
-    setAllcol(newAllCol);
-    setLead((prev) => prev + 1);
+    if (currSection === 1) {
+      let newAllCol = [...tblData];
+      let temp = newAllCol[row1][`col${col1}`];
+      newAllCol[row1][`col${col1}`] = newAllCol[row2][`col${col2}`];
+      newAllCol[row2][`col${col2}`] = temp;
+      setTblData(newAllCol);
+    } else if (currSection === 2) {
+      let newAllCol = [...newtblData];
+      let temp = newAllCol[row1][`col${col1}`];
+      newAllCol[row1][`col${col1}`] = newAllCol[row2][`col${col2}`];
+      newAllCol[row2][`col${col2}`] = temp;
+      setNewtblData(newAllCol);
+    }
   };
 
-  const handleSwap = () => {
-    const row1 = Object.keys(selectedObj[0])[0];
-    const col1 = selectedObj[0][row1];
+  const handleSwapHelper = (obj) => {
+    if (obj.length === 2) {
+      const row1 = Object.keys(obj[0])[0];
+      const col1 = obj[0][row1];
 
-    const row2 = Object.keys(selectedObj[1])[0];
-    const col2 = selectedObj[1][row2];
+      const row2 = Object.keys(obj[1])[0];
+      const col2 = obj[1][row2];
 
-    if (row1 !== -1 && row2 !== -1) {
-      swap(row1, col1 - 1, row2, col2 - 1);
+      console.log(row1, col1, row2, col2);
+
+      if (row1 >= 0 && row2 >= 0) {
+        swap(row1, col1 + 1, row2, col2 + 1);
+      }
     }
+  }
 
+  const resetTable = () => {
     const newObj = {};
     newObj[-1] = -1;
-    const newArr = [...selectedObj];
+    const newArr = [...selectedObj1];
     newArr[0] = newObj;
     newArr[1] = newObj;
-    const newCellObjArr = [...cellObj];
+    const newCellObjArr = [...cellObj1];
     newCellObjArr[0]["value"] = "Not selected";
     newCellObjArr[1]["value"] = "Not selected";
-    setSelectedObj(newArr);
-    setCellObj(newCellObjArr);
+    setSelectedObj1(newArr);
+    setSelectedObj2(newArr);
+    setCellObj1(newCellObjArr);
+    setCellObj2(newCellObjArr);
+  }
+
+  const handleSwap = () => {
+    if (currSection === 1) {
+      handleSwapHelper(selectedObj1);
+    } else if (currSection === 2) {
+      handleSwapHelper(selectedObj2);
+    }
+
+    resetTable();
   };
 
   // console.log(sttime, lsttime);
@@ -493,12 +522,21 @@ function Home() {
 
   // console.log(ccallcol);
   // console.log(allcol);
+
   const handleCellObj = (e, idx1, idx2) => {
-    const newArr = [...cellObj];
-    newArr[idx1][e.target.value] = true;
-    newArr[idx2]["select"] = false;
-    newArr[idx2]["set"] = false;
-    setCellObj(newArr);
+    if (currSection === 1) {
+      const newArr = [...cellObj1];
+      newArr[idx1][e.target.value] = true;
+      newArr[idx2]["select"] = false;
+      newArr[idx2]["set"] = false;
+      setCellObj1(newArr);
+    } else {
+      const newArr = [...cellObj2];
+      newArr[idx1][e.target.value] = true;
+      newArr[idx2]["select"] = false;
+      newArr[idx2]["set"] = false;
+      setCellObj2(newArr);
+    }
   };
 
   const updateTT = () => {
@@ -744,8 +782,8 @@ function Home() {
               copyallcol[j][i] = "A1:" + distribution.T[1][0] + "[T]";
               copyallcol[j + 1][i] = flag
                 ? "A2:" +
-                  distribution.T[1][distribution.T[1].length - 1] +
-                  "[T]"
+                distribution.T[1][distribution.T[1].length - 1] +
+                "[T]"
                 : prevT;
               prevT = "A2:" + distribution.T[1][0] + "[T]";
               flag = false;
@@ -1264,17 +1302,18 @@ function Home() {
               </div>
               <div className="flex flex-row mb-3">
                 <Table
+                  section={1}
+                  setCurrSection={setCurrSection}
                   data={tblData}
-                  cellObj={cellObj}
-                  setCellObj={setCellObj}
-                  selectedObj={selectedObj}
-                  setSelectedObj={setSelectedObj}
+                  cellObj={cellObj1}
+                  setCellObj={setCellObj1}
+                  selectedObj={selectedObj1}
+                  setSelectedObj={setSelectedObj1}
                   columns={tblCols}
                   clickEnabled={clickEnabled}
                 />
                 <input
                   type="checkbox"
-                  id="enableclick"
                   className="print:invisible w-4 h-4"
                   defaultChecked={false}
                   onChange={() => {
@@ -1301,17 +1340,18 @@ function Home() {
                 </div>
                 <div className="flex flex-row">
                   <Table
+                    section={2}
+                    setCurrSection={setCurrSection}
                     data={newtblData}
-                    cellObj={cellObj}
-                    setCellObj={setCellObj}
-                    selectedObj={selectedObj}
-                    setSelectedObj={setSelectedObj}
+                    cellObj={cellObj2}
+                    setCellObj={setCellObj2}
+                    selectedObj={selectedObj2}
+                    setSelectedObj={setSelectedObj2}
                     columns={tblCols}
                     clickEnabled={clickEnabled}
                   />
                   <input
                     type="checkbox"
-                    id="enableclick"
                     className="print:invisible w-4 h-4"
                     defaultChecked={false}
                     onChange={() => {
@@ -1360,7 +1400,7 @@ function Home() {
                   </button>
                 </div>
                 <div className="ml-2 my-auto inline-block">
-                  {cellObj[0]["value"]}
+                  {cellObj1[0]["value"]}
                 </div>
               </div>
 
@@ -1386,7 +1426,7 @@ function Home() {
                   </button>
                 </div>
                 <div className="ml-2 align-center my-auto inline-block">
-                  {cellObj[1]["value"]}
+                  {cellObj1[1]["value"]}
                 </div>
               </div>
 
