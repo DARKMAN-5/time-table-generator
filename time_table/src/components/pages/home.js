@@ -460,11 +460,36 @@ function Home() {
       cls.push(nst);
       ls.push(null);
     }
-
+    console.log("LS", ls);
+    console.log("CLS", cls);
     setTimecol(cls);
     setAllcol([]);
 
-    if (lecturesBeforeLunch === "4") {
+    if (oallp === "aft") {
+      let pos = -1;
+      for (let i = 0; i < ls.length; i++) {
+        if (ls[i] === "Lunch") {
+          pos = i;
+          break;
+        }
+      }
+
+      let nls = [];
+      for (let i = pos + 1; i < ls.length; i++) {
+        nls.push(ls[i]);
+      }
+      nls.push(ls[pos]);
+      for (let i = 0; i < pos; i++) {
+        nls.push(ls[i]);
+      }
+
+      ls = JSON.parse(JSON.stringify(nls));
+    }
+
+    if (
+      (lecturesBeforeLunch === "4" && oallp === "mor") ||
+      (lecturesAfterLunch === "4" && oallp === "aft")
+    ) {
       const slots4bfl = [
         [1, 5, 6, 3, 7],
         [2, 1, 7, 4],
@@ -588,7 +613,7 @@ function Home() {
     uniquearray.sort((a, b) => a - b);
     uniquearray = uniquearray.reverse();
     // console.log("dist", distribution);
-    // console.log("unique", uniquearray);
+    // console.log("LEC", lectslot);
     let dict = {};
     let remmm = 1;
     for (let i = 0; i < uniquearray.length; i++) {
@@ -600,7 +625,7 @@ function Home() {
 
     // console.log("Dict", dict);
 
-    let copyallcol = [...ccallcol];
+    let copyallcol = JSON.parse(JSON.stringify(ccallcol));
     let Lunch_idx = null;
     for (let i = 0; i < copyallcol[0].length; i++) {
       if (copyallcol[0][i] === "Lunch") {
@@ -755,53 +780,6 @@ function Home() {
       }
     }
 
-    // Tutorial Assignment Code
-    // console.log("dist2", distribution);
-    let flag = true;
-    let prevT;
-    for (let i = 0; i < copyallcol[0].length; i++) {
-      for (let j = 0; j < copyallcol.length; j++) {
-        if (
-          batch === 1 &&
-          distribution.T.hasOwnProperty(1) &&
-          distribution.T[1].length > 0 &&
-          copyallcol[j][i] === null
-        ) {
-          copyallcol[j][i] = distribution.T[1][0] + "[T]";
-          distribution.T[1].shift();
-        } else if (
-          batch === 2 &&
-          distribution.T.hasOwnProperty(1) &&
-          distribution.T[1].length > 0 &&
-          j % 2 === 0 &&
-          copyallcol[j][i] === null
-        ) {
-          if (i > Lunch_idx) {
-            if (copyallcol[j + 1][i] === null) {
-              copyallcol[j][i] = "A1:" + distribution.T[1][0] + "[T]";
-              copyallcol[j + 1][i] = flag
-                ? "A2:" +
-                  distribution.T[1][distribution.T[1].length - 1] +
-                  "[T]"
-                : prevT;
-              prevT = "A2:" + distribution.T[1][0] + "[T]";
-              flag = false;
-              distribution.T[1].shift();
-            }
-          } else {
-            copyallcol[j][i] = "A1:" + distribution.T[1][0] + "[T]";
-            copyallcol[j + 1][i] = flag
-              ? "A2:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
-              : prevT;
-            prevT = "A2:" + distribution.T[1][0] + "[T]";
-            flag = false;
-            distribution.T[1].shift();
-          }
-        }
-        // console.log("TIN", copyallcol);
-      }
-    }
-
     // Individual Lab Assignment Code
     arrP = Object.keys(distribution.P).reverse();
     for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
@@ -908,7 +886,80 @@ function Home() {
       }
     }
 
+    // Tutorial Assignment Code
+    // console.log("dist2", distribution);
+    let flag = true;
+    let prevT;
+    for (let i = 0; i < copyallcol[0].length; i++) {
+      for (let j = 0; j < copyallcol.length; j++) {
+        if (
+          batch === 1 &&
+          distribution.T.hasOwnProperty(1) &&
+          distribution.T[1].length > 0 &&
+          copyallcol[j][i] === null
+        ) {
+          copyallcol[j][i] = distribution.T[1][0] + "[T]";
+          distribution.T[1].shift();
+        } else if (
+          batch === 2 &&
+          distribution.T.hasOwnProperty(1) &&
+          distribution.T[1].length > 0 &&
+          j % 2 === 0 &&
+          copyallcol[j][i] === null
+        ) {
+          if (i > Lunch_idx) {
+            if (copyallcol[j + 1][i] === null) {
+              copyallcol[j][i] = "A1:" + distribution.T[1][0] + "[T]";
+              copyallcol[j + 1][i] = flag
+                ? "A2:" +
+                  distribution.T[1][distribution.T[1].length - 1] +
+                  "[T]"
+                : prevT;
+              prevT = "A2:" + distribution.T[1][0] + "[T]";
+              flag = false;
+              distribution.T[1].shift();
+            }
+          } else {
+            copyallcol[j][i] = "A1:" + distribution.T[1][0] + "[T]";
+            copyallcol[j + 1][i] = flag
+              ? "A2:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
+              : prevT;
+            prevT = "A2:" + distribution.T[1][0] + "[T]";
+            flag = false;
+            distribution.T[1].shift();
+          }
+        }
+        // console.log("TIN", copyallcol);
+      }
+    }
+
     // console.log("new", copyallcol);
+
+    if (oallp === "aft") {
+      let newAllCol = [];
+      for (let i = 0; i < copyallcol.length; i++) {
+        newAllCol.push([]);
+      }
+
+      for (let i = 0; i < copyallcol.length; i++) {
+        for (let j = Lunch_idx + 1; j < copyallcol[0].length; j++) {
+          newAllCol[i].push(copyallcol[i][j]);
+        }
+      }
+
+      for (let i = 0; i < copyallcol.length; i++) {
+        newAllCol[i].push(copyallcol[i][Lunch_idx]);
+      }
+
+      for (let i = 0; i < copyallcol.length; i++) {
+        for (let j = 0; j < Lunch_idx; j++) {
+          newAllCol[i].push(copyallcol[i][j]);
+        }
+      }
+
+      copyallcol = [...newAllCol];
+      // copyallcol = JSON.parse(JSON.stringify(ccallcol));
+    }
 
     setAllcol([...copyallcol]);
     setLead((prev) => prev + 1);
@@ -1122,24 +1173,6 @@ function Home() {
                     className="rounded mb-1 text-center outline-none text-black"
                     required
                   />
-
-                  {/* <select
-                    style={{ color: "black" }}
-                    onChange={(e) => {
-                      obj.lPr = e.target.value;
-                    }}
-                    id="priority"
-                    name="priority"
-                    className="w-full"
-                  >
-                    <option
-                      value="Select"
-                      selected="true"
-                      // disabled="disabled"
-                    ></option>
-                    <option value="morning">pre</option>
-                    <option value="afternoon">post</option>
-                  </select> */}
                 </div>
                 <div className="flex flex-col">
                   <div className="text-sm font-bold">T</div>
@@ -1159,23 +1192,6 @@ function Home() {
                     className="rounded  mb-1 text-center outline-none text-black"
                     required
                   />
-
-                  {/* <select
-                    style={{ color: "black" }}
-                    onChange={(e) => {
-                      obj.tPr = e.target.value;
-                    }}
-                    id="priority"
-                    name="priority"
-                  >
-                    <option
-                      value="Select"
-                      selected="true"
-                      // disabled="disabled"
-                    ></option>
-                    <option value="morning">pre</option>
-                    <option value="afternoon">post</option>
-                  </select> */}
                 </div>
                 <div className="flex flex-col mx-2">
                   <div className="text-sm font-bold">P</div>
@@ -1195,44 +1211,8 @@ function Home() {
                     className="rounded mb-1 text-center outline-none text-black"
                     required
                   />
-
-                  {/* <select
-                    style={{ color: "black" }}
-                    onChange={(e) => {
-                      obj.pPr = e.target.value;
-                    }}
-                    id="priority"
-                    name="priority"
-                  >
-                    <option
-                      value="Select"
-                      selected="true"
-                      // disabled="disabled"
-                    ></option>
-                    <option value="morning">pre</option>
-                    <option value="afternoon">post</option>
-                  </select> */}
                 </div>
               </div>
-              {/* <div className="mx-1 w-full">
-                <div className="text-sm font-light mx-2">Lecture Time</div>
-                <select
-                  style={{ color: "black" }}
-                  onChange={(event) => {
-                    obj.totalLectures =
-                      event.target.value === ""
-                        ? 0
-                        : parseFloat(event.target.value, 10);
-                    // console.log(courseInputs);
-                  }}
-                >
-                  <option value="Select" selected>
-                    Select
-                  </option>
-                  <option value="1">1</option>
-                  <option value="1.5">1.5</option>
-                </select>
-              </div> */}
             </div>
           ))}
         </div>
