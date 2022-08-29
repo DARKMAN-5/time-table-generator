@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import "jspdf-autotable";
 import Table from "../navigation/table";
 // import html2canvas from "html2canvas";
+import IIITV from "../../assets/images/IIITV.png";
 
 function Home() {
   let ccallcol = [];
@@ -162,7 +163,7 @@ function Home() {
   const [newtblData, setNewtblData] = useState([]);
   const [tblCols, setTblCols] = useState([]);
 
-  const rotateArray2 = (nums, k, n) => {
+  const rotateArray2 = (nums, k, n, chk) => {
     // reverse helper function
     console.log("bnd", nums);
     for (let i = 0; i < n * k; i++) {
@@ -174,6 +175,45 @@ function Home() {
       j++;
     }
     console.log("and", nums);
+    if (chk && n === 2) {
+      let ok = true;
+      for (let i = 0; i < Object.keys(nums[0]).length - 1; i++) {
+        if (nums[0]["col" + (i + 2)] === "Lunch") {
+          ok = false;
+          continue;
+        }
+
+        if (ok) {
+          continue;
+        }
+
+        nums[2]["col" + (i + 2)] = nums[0]["col" + (i + 2)];
+        nums[3]["col" + (i + 2)] = nums[1]["col" + (i + 2)];
+
+        nums[0]["col" + (i + 2)] = nums[8]["col" + (i + 2)];
+        nums[1]["col" + (i + 2)] = nums[9]["col" + (i + 2)];
+
+        nums[8]["col" + (i + 2)] = "";
+        nums[9]["col" + (i + 2)] = "";
+      }
+    } else if (chk && n === 1) {
+      let ok = true;
+      for (let i = 0; i < Object.keys(nums[0]).length - 1; i++) {
+        if (nums[0]["col" + (i + 2)] === "Lunch") {
+          ok = false;
+          continue;
+        }
+
+        if (ok) {
+          continue;
+        }
+
+        nums[1]["col" + (i + 2)] = nums[0]["col" + (i + 2)];
+        nums[0]["col" + (i + 2)] = nums[4]["col" + (i + 2)];
+
+        nums[4]["col" + (i + 2)] = "";
+      }
+    }
     return nums;
   };
 
@@ -274,8 +314,27 @@ function Home() {
     });
 
     let newdata = JSON.parse(JSON.stringify(data));
+
     if (batch === 2) {
-      newdata = rotateArray2(newdata, 2, 2);
+      let chk = false;
+      for (let j = 0; j < Object.keys(data[0]).length - 1; j++) {
+        if (data[0]["col" + (j + 2)] === "Lunch" && !chk) {
+          chk = true;
+          continue;
+        }
+
+        if (
+          chk &&
+          (data[8]["col" + (j + 2)] !== null ||
+            data[9]["col" + (j + 2)] !== null)
+        ) {
+          chk = false;
+          break;
+        }
+      }
+
+      newdata = rotateArray2(newdata, 2, 2, chk);
+      console.log("val", newdata);
 
       for (let i = 0; i < newdata.length; i++) {
         for (let j = 0; j < Object.keys(newdata[i]).length - 1; j++) {
@@ -290,7 +349,19 @@ function Home() {
         }
       }
     } else {
-      newdata = rotateArray2(newdata, 2, 1);
+      let chk = false;
+      for (let j = 0; j < Object.keys(data[0]).length - 1; j++) {
+        if (data[4]["col" + (j + 2)] === "Lunch") {
+          chk = true;
+          continue;
+        }
+
+        if (chk && data[4]["col" + (j + 2)] !== null) {
+          chk = false;
+        }
+      }
+
+      newdata = rotateArray2(newdata, 2, 1, chk);
     }
     setTblData(data);
     setNewtblData(newdata);
@@ -866,32 +937,12 @@ function Home() {
       }
     }
 
-    // console.log("LAST", last);
-
-    if (batch === 2) {
-      let cc = 0;
-      for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
-        if (copyallcol[1][i] === null) {
-          cc++;
-        }
-      }
-
-      // console.log("cc", cc);
-
-      if (cc === copyallcol[0].length - Lunch_idx - 1) {
-        for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
-          copyallcol[1][i] = copyallcol[last][i];
-          copyallcol[last][i] = null;
-        }
-      }
-    }
-
     // Tutorial Assignment Code
     // console.log("dist2", distribution);
     let flag = true;
     let prevT;
-    for (let i = 0; i < copyallcol[0].length; i++) {
-      for (let j = 0; j < copyallcol.length; j++) {
+    for (let j = 0; j < copyallcol.length; j++) {
+      for (let i = 0; i < copyallcol[0].length; i++) {
         if (
           batch === 1 &&
           distribution.T.hasOwnProperty(1) &&
@@ -908,19 +959,22 @@ function Home() {
           copyallcol[j][i] === null
         ) {
           if (i > Lunch_idx) {
-            if (copyallcol[j + 1][i] === null) {
-              copyallcol[j][i] = "A1:" + distribution.T[1][0] + "[T]";
-              copyallcol[j + 1][i] = flag
-                ? "A2:" +
-                  distribution.T[1][distribution.T[1].length - 1] +
-                  "[T]"
-                : prevT;
-              prevT = "A2:" + distribution.T[1][0] + "[T]";
-              flag = false;
-              distribution.T[1].shift();
+            copyallcol[j][i] = "A1:" + distribution.T[1][0] + "[T]";
+            // copyallcol[(j + 3) % 10][i] = "A2:" + distribution.T[1][0] + "[T]";
+            // copyallcol[(j + 3) % 10][i] = "A2:" + distribution.T[1][0] + "[T]";
+            copyallcol[(j + 3) % 10][i] = flag
+              ? "A2:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
+              : prevT;
+            prevT = "A2:" + distribution.T[1][0] + "[T]";
+            flag = false;
+            distribution.T[1].shift();
+            if ((j + 3) % 10 > last) {
+              last = (j + 3) % 10;
             }
           } else {
             copyallcol[j][i] = "A1:" + distribution.T[1][0] + "[T]";
+            // copyallcol[(j + 3) % 10][i] = "A2:" + distribution.T[1][0] + "[T]";
+            // copyallcol[j + 1][i] = "A2:" + distribution.T[1][0] + "[T]";
             copyallcol[j + 1][i] = flag
               ? "A2:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
               : prevT;
@@ -932,6 +986,72 @@ function Home() {
         // console.log("TIN", copyallcol);
       }
     }
+
+    // console.log("LAST", last);
+    if (batch === 2) {
+      let cc = 0;
+      for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
+        if (copyallcol[1][i] === null) {
+          cc++;
+        }
+      }
+
+      // console.log("cc", cc);
+
+      if (cc === copyallcol[0].length - Lunch_idx - 1 && last >= 8) {
+        for (let i = Lunch_idx + 1; i < copyallcol[0].length; i++) {
+          copyallcol[1][i] = copyallcol[last][i];
+          copyallcol[last][i] = null;
+        }
+      }
+    }
+
+    // // Tutorial Assignment Code
+    // // console.log("dist2", distribution);
+    // let flag = true;
+    // let prevT;
+    // for (let j = 0; j < copyallcol.length; j++) {
+    //   for (let i = 0; i < copyallcol[0].length; i++) {
+    //     if (
+    //       batch === 1 &&
+    //       distribution.T.hasOwnProperty(1) &&
+    //       distribution.T[1].length > 0 &&
+    //       copyallcol[j][i] === null
+    //     ) {
+    //       copyallcol[j][i] = distribution.T[1][0] + "[T]";
+    //       distribution.T[1].shift();
+    //     } else if (
+    //       batch === 2 &&
+    //       distribution.T.hasOwnProperty(1) &&
+    //       distribution.T[1].length > 0 &&
+    //       j % 2 === 0 &&
+    //       copyallcol[j][i] === null
+    //     ) {
+    //       if (i > Lunch_idx) {
+    //         if (copyallcol[j + 1][i] === null) {
+    //           copyallcol[j][i] = "A1:" + distribution.T[1][0] + "[T]";
+    //           copyallcol[j + 1][i] = flag
+    //             ? "A2:" +
+    //               distribution.T[1][distribution.T[1].length - 1] +
+    //               "[T]"
+    //             : prevT;
+    //           prevT = "A2:" + distribution.T[1][0] + "[T]";
+    //           flag = false;
+    //           distribution.T[1].shift();
+    //         }
+    //       } else {
+    //         copyallcol[j][i] = "A1:" + distribution.T[1][0] + "[T]";
+    //         copyallcol[j + 1][i] = flag
+    //           ? "A2:" + distribution.T[1][distribution.T[1].length - 1] + "[T]"
+    //           : prevT;
+    //         prevT = "A2:" + distribution.T[1][0] + "[T]";
+    //         flag = false;
+    //         distribution.T[1].shift();
+    //       }
+    //     }
+    //     // console.log("TIN", copyallcol);
+    //   }
+    // }
 
     // console.log("new", copyallcol);
 
@@ -968,9 +1088,13 @@ function Home() {
   // console.log("rows", rows);
   return (
     <div className="mx-auto w-full print:invisible">
-      <div className={lead === 0 ? "block w-2/3 mx-auto my-10" : "hidden"}>
+      <div className="mx-auto text-center text-4xl text-black mt-3 print:visible">
+        <img src={IIITV} alt="IIITV" className="inline-block w-16 mx-2" />
+        Indian Institute of Information Technology Vadodara
+      </div>
+      <div className={lead === 0 ? "block w-2/3 mx-auto mb-10" : "hidden"}>
         <div className="bg-bck-4 text-center rounded ">
-          <div className="pt-5 text-xl font-semibold">TOTAL WEEKDAYS</div>
+          {/* <div className="pt-5 text-xl font-semibold">TOTAL WEEKDAYS</div>
           <select
             value={rows}
             onChange={(event) => {
@@ -982,12 +1106,27 @@ function Home() {
           >
             <option value="5">5</option>
             <option value="6">6</option>
-          </select>
+          </select> */}
           {/* {rows} */}
           {/* <br /> */}
           <div className="text-center rounded my-3 py-2 flex flex-row flex-wrap justify-evenly">
             <div className="bg-bck-3 p-5 m-5 w-64 rounded">
-              <div className="text-l font-semibold">1. LUNCH START TIME</div>
+              <div className="text-l font-semibold">1. TOTAL WEEKDAYS</div>
+              <select
+                value={rows}
+                onChange={(event) => {
+                  setRows(parseInt(event.target.value));
+                }}
+                style={{ color: "black" }}
+                id="rows"
+                name="rows"
+              >
+                <option value="5">5</option>
+              </select>
+            </div>
+
+            <div className="bg-bck-3 p-5 m-5 w-64 rounded">
+              <div className="text-l font-semibold">2. LUNCH START TIME</div>
               <select
                 value={lunchStartTime}
                 onChange={(e) => setLunchStartTime(e.target.value)}
@@ -1002,7 +1141,7 @@ function Home() {
             </div>
 
             <div className="bg-bck-3 p-5 m-5 w-64 rounded">
-              <div className="text-l font-semibold">2. SLOTS BEFORE LUNCH</div>
+              <div className="text-l font-semibold">3. SLOTS BEFORE LUNCH</div>
               <select
                 style={{ color: "black" }}
                 value={lecturesBeforeLunch}
@@ -1016,7 +1155,7 @@ function Home() {
             </div>
 
             <div className="bg-bck-3 p-5 m-5 w-64 rounded">
-              <div className="text-l font-semibold">3. SLOTS START TIME</div>
+              <div className="text-l font-semibold">4. SLOTS START TIME</div>
               <select
                 style={{ color: "black" }}
                 id="lectureStartTime"
@@ -1034,7 +1173,7 @@ function Home() {
             </div>
 
             <div className="bg-bck-3 p-5 m-5 w-64 rounded">
-              <div className="text-l font-semibold">4. LUNCH END TIME</div>
+              <div className="text-l font-semibold">5. LUNCH END TIME</div>
               <select
                 style={{ color: "black" }}
                 id="lunchEndTime"
@@ -1053,7 +1192,7 @@ function Home() {
             </div>
 
             <div className="bg-bck-3 p-5 m-5 w-64 rounded">
-              <div className="text-l font-semibold">5. SLOTS AFTER LUNCH</div>
+              <div className="text-l font-semibold">6. SLOTS AFTER LUNCH</div>
               <select
                 style={{ color: "black" }}
                 value={lecturesAfterLunch}
@@ -1068,7 +1207,7 @@ function Home() {
               </select>
             </div>
             <div className="bg-bck-3 p-5 m-5 w-64 rounded">
-              <div className="text-l font-semibold">6. LECTURE PRIORITY</div>
+              <div className="text-l font-semibold">7. LECTURE PRIORITY</div>
               <select
                 style={{ color: "black" }}
                 value={oallp}
@@ -1087,7 +1226,7 @@ function Home() {
             </div>
 
             <div className="bg-bck-3 p-5 m-5 w-64 rounded">
-              <div className="text-l font-semibold">7. TOTAL SECTION</div>
+              <div className="text-l font-semibold">8. TOTAL SECTION</div>
               <select
                 value={sectn}
                 onChange={(e) => setSectn(parseInt(e.target.value))}
@@ -1101,7 +1240,7 @@ function Home() {
             </div>
 
             <div className="bg-bck-3 p-5 m-5 w-64 rounded">
-              <div className="text-l font-semibold">8. BATCH PER SECTION</div>
+              <div className="text-l font-semibold">9. BATCH PER SECTION</div>
               <select
                 value={batch}
                 onChange={(e) => setBatch(parseInt(e.target.value))}
@@ -1132,7 +1271,7 @@ function Home() {
       <div
         className={
           lead === 1
-            ? "p-10 rounded block w-3/4 mx-auto bg-bck-4 text-center my-10"
+            ? "p-10 rounded block w-3/4 mx-auto bg-bck-4 text-center mb-10 mt-2"
             : "hidden"
         }
         id="secondpage"
@@ -1149,7 +1288,7 @@ function Home() {
                   onChange={(event) => {
                     obj.courseCode = event.target.value;
                   }}
-                  className="rounded text-center outline-none text-black w-1/2"
+                  className="rounded text-center outline-none text-black w-2/3"
                   required
                 />
               </div>
@@ -1255,7 +1394,7 @@ function Home() {
       <div
         className={
           lead !== 0 && lead !== 1
-            ? "mx-10  py-5 rounded flex flex-col"
+            ? "mx-10  pb-2 rounded flex flex-col"
             : "hidden"
         }
         id="Thirdpage"
@@ -1263,17 +1402,11 @@ function Home() {
         <div className="flex flex-row flex-wrap justify-evenly">
           <div
             className={
-              prnt1 === 1 && prnt2 === 1
-                ? "flex flex-col flex-wrap justify-evenly print:visible print:absolute print:top-10"
-                : "flex flex-col flex-wrap justify-evenly"
+              "flex flex-col flex-wrap justify-evenly print:visible print:absolute print:top-20"
             }
           >
             <div
-              className={
-                prnt1 === 1 && prnt2 === 0
-                  ? "print:visible print:absolute print:top-10"
-                  : ""
-              }
+              className={prnt1 === 0 ? "print:invisible print:absolute" : ""}
               id="tableId1"
             >
               <div className="font-bold text-xl text-black text-center">
@@ -1308,11 +1441,7 @@ function Home() {
             </div>
             <div className={sectn === 2 ? "" : "hidden"} id="tableId2">
               <div
-                className={
-                  prnt2 === 1 && prnt1 === 0
-                    ? "print:visible print:absolute print:top-10"
-                    : ""
-                }
+                className={prnt2 === 0 ? "print:invisible print:absolute" : ""}
               >
                 <div className="font-bold text-xl text-black text-center">
                   SECTION 2
