@@ -1278,7 +1278,7 @@ function Home() {
       >
         <div className=" flex flex-row flex-wrap justify-evenly ">
           {courseInputs.map((obj) => (
-            <div className="w-1/4 flex flex-row justify-evenly bg-bck-3 text-center rounded my-5 mx-2 py-4 px-2">
+            <div className="w-72 flex flex-row justify-evenly bg-bck-3 text-center rounded my-5 mx-2 py-4 px-2">
               <div className="w-full">
                 <div className="text-sm font-bold">CC</div>
                 <input
@@ -1288,7 +1288,7 @@ function Home() {
                   onChange={(event) => {
                     obj.courseCode = event.target.value;
                   }}
-                  className="rounded text-center outline-none text-black w-2/3"
+                  className="rounded text-center outline-none text-black w-16"
                   required
                 />
               </div>
@@ -1363,8 +1363,8 @@ function Home() {
         <p className="text-xs font-thin text-yellow-300 mb-2">
           P - PRACTICAL / LAB
         </p>
-        <div className="flex flex-row">
-          <div className="w-1/6 mx-auto align-center my-3">
+        <div className="flex md:flex-row flex-col">
+          <div className="w-40 mx-auto align-center my-3">
             <button
               onClick={() => window.location.reload()}
               className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
@@ -1372,7 +1372,7 @@ function Home() {
               &laquo; Back
             </button>
           </div>
-          <div className="w-1/6 mx-auto align-center my-3">
+          <div className="w-40 mx-auto align-center my-3">
             <button
               onClick={addCourseInputs}
               className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
@@ -1380,7 +1380,7 @@ function Home() {
               Add
             </button>
           </div>
-          <div className="w-1/6 mx-auto align-center my-3">
+          <div className="w-40 mx-auto align-center my-3">
             <button
               onClick={updateTT}
               className="w-full text-white bg-bck-3 hover:bg-bck-3 focus:ring-4 focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 dark:bg-bck-3-600 dark:hover:bg-blue-300 focus:outline-none dark:focus:ring-blue-800"
